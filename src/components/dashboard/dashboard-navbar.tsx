@@ -34,32 +34,32 @@ export function DashboardNavbar({ onMenuToggle }: DashboardNavbarProps) {
           </Link>
         </div>
 
-        {/* <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <nav className="hidden items-center gap-1 md:flex">
             <Link
               href="/about"
-              className="rounded-full px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              className="rounded-full px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-foreground/80 transition hover:bg-muted hover:text-foreground"
             >
               About Us
             </Link>
             <Link
               href="/contact-us"
-              className="rounded-full px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              className="rounded-full px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-foreground/80 transition hover:bg-muted hover:text-foreground"
             >
               Contact Us
             </Link>
             <button
               type="button"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-foreground/80 transition hover:bg-muted hover:text-foreground"
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5" />
-              <span className="absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+              <span className="absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-white">
                 3
               </span>
             </button>
           </nav>
-        </div> */}
+        </div>
       </div>
     </header>
   );
