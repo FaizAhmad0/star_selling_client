@@ -8,6 +8,8 @@ export interface AuthUser {
   enrollmentIdAmazon?: string;
   enrollmentIdWebsite?: string;
   enrollmentIdEtsy?: string;
+  platform: { id: string; name: string } | null;
+  platforms: { id: string; name: string }[];
 }
 
 export interface LoginResponse {
