@@ -1,5 +1,5 @@
 import UsersPage from "@/features/users/components/users-page";
 
-export default function AdminUsersPage() {
+export default function SupervisorUsersPage() {
   return <UsersPage />;
 }
