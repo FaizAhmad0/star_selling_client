@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Users, X } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, Layers, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +20,10 @@ interface DashboardSidebarProps {
 }
 
 function isActivePath(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(href + "/");
+  if (href.split("/").length === 2) {
+    return pathname === href;
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function DashboardSidebar({
@@ -115,6 +118,7 @@ export const adminNavItems: SidebarNavItem[] = [
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Managers", href: "/admin/managers", icon: Users },
   { label: "Supervisors", href: "/admin/supervisors", icon: Users },
+  { label: "Platforms", href: "/admin/platforms", icon: Layers },
 ];
 
 export const managerNavItems: SidebarNavItem[] = [
