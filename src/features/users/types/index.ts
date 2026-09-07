@@ -82,10 +82,9 @@ export interface UserQueryParams {
   search?: string;
   manager?: string;
   batch?: string;
-  status?: "active" | "inactive";
   joiningDateFrom?: string;
   joiningDateTo?: string;
-  platform?: "amazon" | "website" | "etsy";
+  platform?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }

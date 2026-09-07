@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { useUsers, useDeleteUser } from "@/features/users/hooks/use-users";
 import { UsersTable } from "@/features/users/components/users-data-table";
 import { UsersFilter } from "@/features/users/components/users-filter";
+import { usePlatforms } from "@/features/platforms/hooks/use-platforms";
+import { useManagers } from "@/features/managers/hooks/use-managers";
 import type { User } from "@/features/users/types";
 
 const LIMIT = 10;
@@ -21,7 +23,6 @@ export default function UsersPage() {
 
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
-  const status = searchParams.get("status") || "";
   const manager = searchParams.get("manager") || "";
   const batch = searchParams.get("batch") || "";
   const platform = searchParams.get("platform") || "";
@@ -85,7 +86,6 @@ export default function UsersPage() {
 
   const handleClearFilters = useCallback(() => {
     updateParams({
-      status: "",
       manager: "",
       batch: "",
       platform: "",
@@ -99,10 +99,9 @@ export default function UsersPage() {
     page,
     limit: LIMIT,
     search: search || undefined,
-    status: (status as "active" | "inactive") || undefined,
     manager: manager || undefined,
     batch: batch || undefined,
-    platform: (platform as "amazon" | "website" | "etsy") || undefined,
+    platform: (platform as string) || undefined,
     joiningDateFrom: joiningDateFrom || undefined,
     joiningDateTo: joiningDateTo || undefined,
     sortBy: sortBy || undefined,
@@ -112,32 +111,28 @@ export default function UsersPage() {
   const users = data?.data?.data ?? [];
   const meta = data?.data?.meta ?? { page: 1, limit: LIMIT, total: 0, totalPages: 0 };
 
+  const { data: platformsData, isLoading: platformsLoading } = usePlatforms({ status: "active" });
+  const platforms = platformsData?.data ?? [];
+  const platformOptions = platforms.map((p) => ({ label: p.name, value: p.name.toLowerCase() }));
+
+  const { data: managersData, isLoading: managersLoading } = useManagers({ limit: 1000 });
+  const managers = managersData?.data?.data ?? [];
+  const managerOptions = managers.map((m) => ({ label: m.name, value: m.name }));
+
   const filterGroups = [
     {
       label: "Platform",
       key: "platform",
       type: "platform-select" as const,
-      options: [
-        { label: "Amazon", value: "amazon" },
-        { label: "Website", value: "website" },
-        { label: "Etsy", value: "etsy" },
-      ],
+      options: platformOptions,
+      loading: platformsLoading,
     },
-    { label: "Manager", key: "manager", type: "manager-select" as const },
+    { label: "Manager", key: "manager", type: "manager-select" as const, options: managerOptions, loading: managersLoading },
     { label: "Batch", key: "batch", type: "text" as const },
-    {
-      label: "Status",
-      key: "status",
-      options: [
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
-      ],
-    },
     { label: "Joining Date", key: "joiningDate", type: "date" as const },
   ];
 
   const activeFilters: Record<string, string> = {};
-  if (status) activeFilters.status = status;
   if (manager) activeFilters.manager = manager;
   if (batch) activeFilters.batch = batch;
   if (platform) activeFilters.platform = platform;
@@ -214,6 +209,8 @@ export default function UsersPage() {
           onFilterChange={handleFilterChange}
           onApplyFilters={handleApplyFilters}
           onClearFilters={handleClearFilters}
+          managerOptions={managerOptions}
+          managerLoading={managersLoading}
         />
       </div>
 
