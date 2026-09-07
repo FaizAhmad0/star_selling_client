@@ -6,6 +6,7 @@ import { Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useManagers } from "@/features/managers/hooks/use-managers";
+import { usePlatforms } from "@/features/platforms/hooks/use-platforms";
 import { ManagersTable } from "@/features/managers/components/managers-data-table";
 import { ManagersFilter } from "@/features/managers/components/managers-filter";
 
@@ -78,7 +79,7 @@ export default function ManagersPage() {
     page,
     limit: LIMIT,
     search: search || undefined,
-    platform: (platform as "amazon" | "website" | "etsy") || undefined,
+    platform: platform || undefined,
     sortBy: sortBy || undefined,
     sortOrder: (sortOrder as "asc" | "desc") || undefined,
   });
@@ -86,16 +87,17 @@ export default function ManagersPage() {
   const managers = data?.data?.data ?? [];
   const meta = data?.data?.meta ?? { page: 1, limit: LIMIT, total: 0, totalPages: 0 };
 
+  const { data: platformsData, isLoading: platformsLoading } = usePlatforms({ status: "active" });
+  const platforms = platformsData?.data ?? [];
+  const platformOptions = platforms.map((p) => ({ label: p.name, value: p.name.toLowerCase() }));
+
   const filterGroups = [
     {
       label: "Platform",
       key: "platform",
       type: "platform-select" as const,
-      options: [
-        { label: "Amazon", value: "amazon" },
-        { label: "Website", value: "website" },
-        { label: "Etsy", value: "etsy" },
-      ],
+      options: platformOptions,
+      loading: platformsLoading,
     },
   ];
 
