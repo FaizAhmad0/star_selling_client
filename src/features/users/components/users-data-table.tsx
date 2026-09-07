@@ -27,10 +27,28 @@ function getBatch(user: User): string {
   return user.batchAmazon || user.batchWebsite || user.batchEtsy || "\u2014";
 }
 
-function getManager(user: User): string {
-  return getManagerName(
-    user.amazonManager || user.websiteManager || user.etsyManager,
-  );
+function getAllManagers(user: User): { platform: string; name: string }[] {
+  const managers: { platform: string; name: string }[] = [];
+
+  if (user.amazonManager)
+    managers.push({
+      platform: "Amazon",
+      name: getManagerName(user.amazonManager),
+    });
+
+  if (user.websiteManager)
+    managers.push({
+      platform: "Website",
+      name: getManagerName(user.websiteManager),
+    });
+
+  if (user.etsyManager)
+    managers.push({
+      platform: "Etsy",
+      name: getManagerName(user.etsyManager),
+    });
+
+  return managers;
 }
 
 function PlatformsCell({ platforms }: { platforms?: PlatformRef[] }) {
@@ -210,12 +228,29 @@ export function UsersTable({
     {
       title: "Manager",
       key: "manager",
-      responsive: ["lg"],
-      render: (_, record) => (
-        <span className="text-xs text-muted-foreground">
-          {getManager(record)}
-        </span>
-      ),
+      responsive: ["sm"],
+      render: (_, record) => {
+        const managers = getAllManagers(record);
+
+        if (managers.length === 0)
+          return <span className="text-xs text-muted-foreground">—</span>;
+
+        return (
+          <div className="flex flex-wrap gap-1">
+            {managers.map((manager) => (
+              <span
+                key={manager.platform}
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+              >
+                <span className="text-muted-foreground">
+                  {manager.platform}:
+                </span>
+                <span>{manager.name}</span>
+              </span>
+            ))}
+          </div>
+        );
+      },
     },
     {
       title: "Batch",
@@ -236,7 +271,7 @@ export function UsersTable({
         <div className="flex items-center gap-0.5">
           <button
             onClick={() => onView(record)}
-            className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors hover:cursor-pointer"
             title="View"
           >
             <Eye className="size-3.5" />
@@ -251,7 +286,7 @@ export function UsersTable({
           {onDelete && (
             <ConfirmDelete onConfirm={() => onDelete(record)}>
               <button
-                className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors hover:cursor-pointer"
                 title="Delete"
               >
                 <Trash2 className="size-3.5" />
