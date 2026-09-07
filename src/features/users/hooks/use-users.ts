@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   getUsers,
+  getUserById,
   createUser,
   updateUser,
   deleteUser,
@@ -14,6 +15,15 @@ export function useUsers(params: UserQueryParams = {}) {
     queryKey: ["users", params],
     queryFn: () => getUsers(params),
     staleTime: 30_000,
+  });
+}
+
+export function useUser(id: string) {
+  return useQuery({
+    queryKey: ["users", id],
+    queryFn: () => getUserById(id),
+    staleTime: 30_000,
+    enabled: !!id,
   });
 }
 

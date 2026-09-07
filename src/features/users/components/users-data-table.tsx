@@ -14,9 +14,12 @@ function getManagerName(manager: ManagerRef | string | undefined): string {
 
 function getAllEnrollments(user: User): { platform: string; id: string }[] {
   const enrollments: { platform: string; id: string }[] = [];
-  if (user.enrollmentIdAmazon) enrollments.push({ platform: "Amazon", id: user.enrollmentIdAmazon });
-  if (user.enrollmentIdWebsite) enrollments.push({ platform: "Website", id: user.enrollmentIdWebsite });
-  if (user.enrollmentIdEtsy) enrollments.push({ platform: "Etsy", id: user.enrollmentIdEtsy });
+  if (user.enrollmentIdAmazon)
+    enrollments.push({ platform: "Amazon", id: user.enrollmentIdAmazon });
+  if (user.enrollmentIdWebsite)
+    enrollments.push({ platform: "Website", id: user.enrollmentIdWebsite });
+  if (user.enrollmentIdEtsy)
+    enrollments.push({ platform: "Etsy", id: user.enrollmentIdEtsy });
   return enrollments;
 }
 
@@ -25,15 +28,21 @@ function getBatch(user: User): string {
 }
 
 function getManager(user: User): string {
-  return getManagerName(user.amazonManager || user.websiteManager || user.etsyManager);
+  return getManagerName(
+    user.amazonManager || user.websiteManager || user.etsyManager,
+  );
 }
 
 function PlatformsCell({ platforms }: { platforms?: PlatformRef[] }) {
-  if (!platforms || platforms.length === 0) return <span className="text-xs text-muted-foreground">\u2014</span>;
+  if (!platforms || platforms.length === 0)
+    return <span className="text-xs text-muted-foreground">\u2014</span>;
   return (
     <div className="flex flex-wrap gap-1">
       {platforms.map((p) => (
-        <span key={p._id} className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+        <span
+          key={p._id}
+          className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+        >
           {p.name}
         </span>
       ))}
@@ -57,20 +66,46 @@ function maskPhoneNumber(phone: string): string {
   return "X".repeat(phone.length - 4) + phone.slice(-4);
 }
 
-function ConfirmDelete({ onConfirm, children }: { onConfirm: () => void; children: React.ReactNode }) {
+function ConfirmDelete({
+  onConfirm,
+  children,
+}: {
+  onConfirm: () => void;
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <span onClick={() => setOpen(true)} className="cursor-pointer">{children}</span>
+      <span onClick={() => setOpen(true)} className="cursor-pointer">
+        {children}
+      </span>
       {open && (
         <>
-          <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <div
+            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+            onClick={() => setOpen(false)}
+          />
           <div className="fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 w-80 rounded-lg border border-border bg-card p-4 shadow-lg">
             <p className="text-sm font-medium text-foreground">Delete user</p>
-            <p className="mt-1 text-xs text-muted-foreground">This action cannot be undone.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              This action cannot be undone.
+            </p>
             <div className="mt-4 flex items-center justify-end gap-2">
-              <button onClick={() => setOpen(false)} className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">Cancel</button>
-              <button onClick={() => { onConfirm(); setOpen(false); }} className="rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-destructive-foreground hover:bg-destructive/90">Delete</button>
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onConfirm();
+                  setOpen(false);
+                }}
+                className="rounded-md bg-destructive px-3 py-1.5 text-xs font-medium text-white hover:bg-destructive/90"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </>
@@ -79,20 +114,40 @@ function ConfirmDelete({ onConfirm, children }: { onConfirm: () => void; childre
   );
 }
 
-export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdit, onDelete, maskPhone }: UsersTableProps) {
+export function UsersTable({
+  users,
+  meta,
+  isLoading,
+  onPageChange,
+  onView,
+  onEdit,
+  onDelete,
+  maskPhone,
+}: UsersTableProps) {
   const columns: TableProps<User>["columns"] = [
     {
       title: "User",
       dataIndex: "name",
       key: "name",
       render: (_, record) => {
-        const initials = record.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+        const initials = record.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2);
         return (
           <div className="flex items-center gap-3">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">{initials}</div>
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+              {initials}
+            </div>
             <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-foreground">{record.name}</p>
-              <p className="truncate text-[11px] text-muted-foreground">{record.email}</p>
+              <p className="truncate text-xs font-medium text-foreground">
+                {record.name}
+              </p>
+              <p className="truncate text-[11px] text-muted-foreground">
+                {record.email}
+              </p>
             </div>
           </div>
         );
@@ -103,7 +158,11 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       dataIndex: "uid",
       key: "uid",
       responsive: ["sm"],
-      render: (val: number) => <span className="font-mono text-xs text-foreground">{val ? `UID${val}` : "\u2014"}</span>,
+      render: (val: number) => (
+        <span className="font-mono text-xs text-foreground">
+          {val ? `UID${val}` : "\u2014"}
+        </span>
+      ),
     },
     {
       title: "Enrollment",
@@ -111,11 +170,15 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       responsive: ["sm"],
       render: (_, record) => {
         const enrollments = getAllEnrollments(record);
-        if (enrollments.length === 0) return <span className="text-xs text-muted-foreground">\u2014</span>;
+        if (enrollments.length === 0)
+          return <span className="text-xs text-muted-foreground">\u2014</span>;
         return (
           <div className="flex flex-wrap gap-1">
             {enrollments.map((e) => (
-              <span key={e.platform} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+              <span
+                key={e.platform}
+                className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"
+              >
                 <span className="text-muted-foreground">{e.platform}:</span>
                 <span className="font-mono">{e.id}</span>
               </span>
@@ -131,7 +194,11 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       responsive: ["md"],
       render: (val: string) => {
         const display = maskPhone && val ? maskPhoneNumber(val) : val;
-        return <span className="text-xs text-muted-foreground">{display || "\u2014"}</span>;
+        return (
+          <span className="text-xs text-muted-foreground">
+            {display || "\u2014"}
+          </span>
+        );
       },
     },
     {
@@ -144,13 +211,21 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
       title: "Manager",
       key: "manager",
       responsive: ["lg"],
-      render: (_, record) => <span className="text-xs text-muted-foreground">{getManager(record)}</span>,
+      render: (_, record) => (
+        <span className="text-xs text-muted-foreground">
+          {getManager(record)}
+        </span>
+      ),
     },
     {
       title: "Batch",
       key: "batch",
       responsive: ["lg"],
-      render: (_, record) => <span className="text-xs text-muted-foreground">{getBatch(record)}</span>,
+      render: (_, record) => (
+        <span className="text-xs text-muted-foreground">
+          {getBatch(record)}
+        </span>
+      ),
     },
     {
       title: "Actions",
@@ -166,13 +241,13 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
           >
             <Eye className="size-3.5" />
           </button>
-          <button
+          {/* <button
             onClick={() => onEdit(record)}
             className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             title="Edit"
           >
             <Pencil className="size-3.5" />
-          </button>
+          </button> */}
           {onDelete && (
             <ConfirmDelete onConfirm={() => onDelete(record)}>
               <button
@@ -201,7 +276,8 @@ export function UsersTable({ users, meta, isLoading, onPageChange, onView, onEdi
           pageSize: meta.limit,
           total: meta.total,
           showSizeChanger: false,
-          showTotal: (total, range) => `Showing ${range[0]}\u2013${range[1]} of ${total} users`,
+          showTotal: (total, range) =>
+            `Showing ${range[0]}\u2013${range[1]} of ${total} users`,
           onChange: (page) => onPageChange(page),
         }}
         scroll={{ x: 1000 }}
