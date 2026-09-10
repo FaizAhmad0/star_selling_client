@@ -123,15 +123,36 @@ export default function LoginPage() {
           fill="none"
         />
         <defs>
-          <radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(200 150) scale(300)">
+          <radialGradient
+            id="g1"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="translate(200 150) scale(300)"
+          >
             <stop stopColor="hsl(var(--primary))" stopOpacity="0.15" />
             <stop offset="1" stopColor="hsl(var(--primary))" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="g2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1200 700) scale(350)">
+          <radialGradient
+            id="g2"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="translate(1200 700) scale(350)"
+          >
             <stop stopColor="hsl(var(--primary))" stopOpacity="0.1" />
             <stop offset="1" stopColor="hsl(var(--primary))" stopOpacity="0" />
           </radialGradient>
-          <radialGradient id="g3" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(700 450) scale(200)">
+          <radialGradient
+            id="g3"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="translate(700 450) scale(200)"
+          >
             <stop stopColor="hsl(var(--accent))" stopOpacity="0.12" />
             <stop offset="1" stopColor="hsl(var(--accent))" stopOpacity="0" />
           </radialGradient>

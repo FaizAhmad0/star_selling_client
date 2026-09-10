@@ -1,7 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
-import { Check, ExternalLink } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import {
+  CheckCircle, ClipboardCheck, Clock, CreditCard, ExternalLink, FileText,
+  Globe, Handshake, Palette, Phone, Rocket, Server, Share2, UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { ErrorState } from "@/components/shared/error-state";
 import { Loading } from "@/components/shared/loading";
 import { useCurrentUser } from "@/features/auth/hooks/use-auth";
@@ -408,69 +412,215 @@ function MetaItem({ label, value, fieldKey }: { label: string; value: string | n
   );
 }
 
-function FieldRow({
-  label,
-  value,
-  fieldKey,
-}: {
-  label: string;
-  value: string | number | boolean | null | undefined;
-  fieldKey: keyof WebsiteWorkStatusUser;
-}) {
+const WORK_STEPS = STAGE_CONFIGS.flatMap((stage) =>
+  stage.groups.flatMap((group) =>
+    group.fields.map((field) => ({ ...field, group: group.title, stage: stage.shortLabel })),
+  ),
+);
+
+const COMPLETED_STATUSES = new Set([
+  "yes", "true", "1", "done", "complete", "completed", "purchase done",
+  "active", "live", "handover", "submitted", "approved", "sent", "received",
+  "paid", "connected", "confirmed", "transferred", "purchased",
+]);
+
+const UNFINISHED_STATUSES = new Set([
+  "no", "false", "0", "pending", "not sent", "not done", "not yet",
+  "in progress", "inactive", "rejected", "unpaid", "not started",
+  "n/a", "na", "none", "null", "undefined", "-", "—",
+]);
+
+// These steps collect information; workflow status fields require a positive status.
+const INFORMATION_KEYS = new Set<keyof WebsiteWorkStatusUser>([
+  "dateWebsite", "enrollmentIdWebsite", "batchWebsite", "name", "email",
+  "primaryContact", "gstNumber", "domainName", "serverEmail", "websiteRemark",
+  "gstInvoice", "leegalityPdf", "aadharCard",
+]);
+
+function isStepComplete(
+  value: ReturnType<typeof resolveDisplayValue>,
+  fieldKey: keyof WebsiteWorkStatusUser,
+) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value > 0;
+  if (typeof value !== "string") return false;
+
+  const status = formatLabel(value).toLowerCase();
+  if (!status || UNFINISHED_STATUSES.has(status)) return false;
+  if (COMPLETED_STATUSES.has(status)) return true;
+  return INFORMATION_KEYS.has(fieldKey) || toLinkHref(value) !== null;
+}
+
+const GROUP_ICONS: Record<string, LucideIcon> = {
+  Enrollment: ClipboardCheck,
+  Contact: UserRound,
+  Onboarding: Phone,
+  "Domain Setup": Globe,
+  Documents: FileText,
+  "Design Assets": Palette,
+  "Content & Social": Share2,
+  "Server & Domain": Server,
+  Launch: Rocket,
+  "Payment & Gateway": CreditCard,
+  Handover: Handshake,
+  "Final Documents": FileText,
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.75 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: "easeOut" as const },
+  },
+};
+
+const nodeVariants = {
+  hidden: { opacity: 0, scale: 0.5 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.4, ease: "easeOut" as const },
+  },
+};
+
+function StatusBadge({ complete }: { complete: boolean }) {
+  const Icon = complete ? CheckCircle : Clock;
+
   return (
-    <div className="flex items-baseline justify-between gap-4 py-2">
-      <dt className="shrink-0 text-[13px] text-muted-foreground">{label}</dt>
-      <dd className="min-w-0 text-right">{renderValue(value, fieldKey)}</dd>
-    </div>
+    <span className={cn(
+      "inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-medium",
+      complete
+        ? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+        : "bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400",
+    )}>
+      <Icon className="size-3" aria-hidden="true" />
+      {complete ? "Completed" : "Pending"}
+    </span>
   );
 }
 
-type StageProgress = {
-  filled: number;
-  total: number;
-  percent: number;
+function WorkStatusCard({
+  field,
+  value,
+  complete,
+  step,
+  reduceMotion,
+}: {
+  field: (typeof WORK_STEPS)[number];
+  value: ReturnType<typeof resolveDisplayValue>;
   complete: boolean;
-};
+  step: number;
+  reduceMotion: boolean;
+}) {
+  const Icon = GROUP_ICONS[field.group] ?? ClipboardCheck;
+  const normalized = typeof value === "string" ? formatLabel(value).toLowerCase() : "";
+  const hasDetail = !isEmptyValue(value) && typeof value !== "boolean"
+    && !COMPLETED_STATUSES.has(normalized) && !UNFINISHED_STATUSES.has(normalized);
 
-function Stepper({ progress }: { progress: StageProgress[] }) {
   return (
-    <div className="rounded-xl border border-border/70 bg-card">
-      <ol className="grid sm:grid-cols-3">
-        {STAGE_CONFIGS.map((stage, index) => {
-          const p = progress[index] ?? { filled: 0, total: 1, percent: 0, complete: false };
-          const isLast = index === STAGE_CONFIGS.length - 1;
+    <motion.article
+      whileHover={reduceMotion ? undefined : { scale: 1.01, y: -2 }}
+      transition={{ duration: 0.2 }}
+      className={cn(
+        "grid w-full grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-3 rounded-xl border border-border bg-card p-3.5 shadow-sm transition-[border-color,box-shadow] duration-200 hover:shadow-md",
+        complete && "hover:border-green-300 dark:hover:border-green-700",
+      )}
+    >
+      <div className={cn(
+        "flex size-9 items-center justify-center rounded-lg",
+        complete
+          ? "bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400"
+          : "bg-gray-100 text-gray-400 dark:bg-white/5",
+      )}>
+        <Icon className="size-4.5" aria-hidden="true" />
+      </div>
+      <div className="min-w-0">
+        <h2 className="text-[13px] font-semibold leading-5 text-foreground">
+          <span className="sr-only">Step {step}: </span>
+          {field.label}
+        </h2>
+        <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{field.group} · {field.stage}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <StatusBadge complete={complete} />
+          {hasDetail && (
+            <div className="min-w-0 max-w-full [overflow-wrap:anywhere]">
+              {renderValue(value, field.key)}
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function Stepper({ user, isFetching }: { user: WebsiteWorkStatusUser; isFetching: boolean }) {
+  const reduceMotion = Boolean(useReducedMotion());
+
+  return (
+    <div className="mx-auto max-w-5xl py-3" aria-busy={isFetching}>
+      <ol className="relative" aria-label="Website work progress">
+        {WORK_STEPS.map((field, index) => {
+          const value = resolveDisplayValue(user, field.key);
+          const complete = isStepComplete(value, field.key);
+          const isLeft = index % 2 === 0;
+
           return (
             <li
-              key={stage.step}
-              className={cn(
-                "relative flex gap-3 px-4 py-3.5",
-                !isLast && "border-b border-border/60 sm:border-b-0 sm:border-r",
-              )}
+              key={field.key}
+              className="relative grid grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-x-3 pb-6 last:pb-0 sm:grid-cols-[minmax(0,1fr)_2.25rem_minmax(0,1fr)] sm:gap-x-6"
+              data-complete={complete}
             >
-              <span
+              {index < WORK_STEPS.length - 1 && (
+                <div
+                  className={cn(
+                    "pointer-events-none absolute left-[18px] top-8 h-full w-0.5 -translate-x-1/2 sm:left-1/2",
+                    complete ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700",
+                  )}
+                  aria-hidden="true"
+                />
+              )}
+
+              <div className="relative z-10 col-start-1 row-start-1 mt-3.5 size-9 sm:col-start-2" aria-hidden="true">
+                <div className={cn(
+                  "absolute left-full top-1/2 h-px w-3 -translate-y-1/2 sm:w-6",
+                  isLeft && "sm:left-auto sm:right-full",
+                  complete ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700",
+                )} />
+                <motion.div
+                  variants={nodeVariants}
+                  initial={reduceMotion ? false : "hidden"}
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.6 }}
+                  className={cn(
+                    "relative flex size-9 items-center justify-center rounded-full border-2 bg-background text-sm font-bold shadow-sm",
+                    complete
+                      ? "border-green-500 text-green-600 dark:text-green-400"
+                      : "border-gray-200 text-gray-400 dark:border-gray-700",
+                  )}
+                >
+                  {index + 1}
+                </motion.div>
+              </div>
+
+              <motion.div
+                variants={cardVariants}
+                initial={reduceMotion ? false : "hidden"}
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.4 }}
                 className={cn(
-                  "flex size-7 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold ring-1 ring-inset",
-                  p.complete
-                    ? "bg-primary text-primary-foreground ring-primary"
-                    : "bg-primary/10 text-primary ring-primary/25",
+                  "relative col-start-2 row-start-1 w-full min-w-0 sm:max-w-sm",
+                  isLeft ? "sm:col-start-1 sm:justify-self-end" : "sm:col-start-3 sm:justify-self-start",
                 )}
               >
-                {p.complete ? <Check className="size-3.5" /> : index + 1}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px] font-semibold text-foreground">
-                  {index + 1}. {stage.shortLabel}
-                </span>
-                <span className="mt-0.5 block text-xs text-muted-foreground">
-                  {p.filled} of {p.total} completed
-                </span>
-                <span className="mt-2 block h-1 overflow-hidden rounded-full bg-muted">
-                  <span
-                    className="block h-full rounded-full bg-primary transition-all"
-                    style={{ width: `${p.percent}%` }}
-                  />
-                </span>
-              </span>
+                <WorkStatusCard
+                  field={field}
+                  value={value}
+                  complete={complete}
+                  step={index + 1}
+                  reduceMotion={reduceMotion}
+                />
+              </motion.div>
             </li>
           );
         })}
@@ -479,62 +629,10 @@ function Stepper({ progress }: { progress: StageProgress[] }) {
   );
 }
 
-function StagePanel({ stage, user, progress }: { stage: StageConfig; user: WebsiteWorkStatusUser; progress: StageProgress }) {
-  return (
-    <section className="rounded-xl border border-border/70 bg-card">
-      <header className="flex flex-wrap items-baseline justify-between gap-2 px-4 pt-4 sm:px-5">
-        <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">{stage.step}</p>
-          <h2 className="mt-1 text-[15px] font-semibold tracking-tight text-foreground">{stage.title}</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">{stage.description}</p>
-        </div>
-        <p className="shrink-0 text-xs font-semibold text-muted-foreground tabular-nums">{progress.percent}%</p>
-      </header>
-      <div className="px-4 pt-3 sm:px-5">
-        <div className="h-1 overflow-hidden rounded-full bg-muted">
-          <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${progress.percent}%` }} />
-        </div>
-      </div>
-      <div className="px-4 py-2 sm:px-5">
-        {stage.groups.map((group, gi) => (
-          <div key={group.title} className={cn(gi > 0 && "border-t border-border/60")}>
-            <h3 className="pt-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
-              {group.title}
-            </h3>
-            <dl className="grid gap-x-8 md:grid-cols-2 2xl:grid-cols-3">
-              {group.fields.map((field) => (
-                <div key={String(field.key)} className="border-b border-border/40 last:border-b-0 md:[&:nth-last-child(2)]:border-b-0 2xl:[&:nth-last-child(3)]:border-b-0">
-                  <FieldRow
-                    label={field.label}
-                    fieldKey={field.key}
-                    value={resolveDisplayValue(user, field.key)}
-                  />
-                </div>
-              ))}
-            </dl>
-          </div>
-        ))}
-        <div className="pb-3" />
-      </div>
-    </section>
-  );
-}
-
 export default function WebsiteWorkStatusPage() {
   const { data, error, isLoading, refetch, isFetching } = useCurrentUser();
 
   const user = data as WebsiteWorkStatusUser | undefined;
-
-  const progress: StageProgress[] = useMemo(() => {
-    if (!user) return [];
-    return STAGE_CONFIGS.map((stage) => {
-      const allFields = stage.groups.flatMap((g) => g.fields);
-      const filled = allFields.filter((f) => !isEmptyValue(resolveDisplayValue(user, f.key))).length;
-      const total = allFields.length;
-      const percent = total === 0 ? 0 : Math.round((filled / total) * 100);
-      return { filled, total, percent, complete: total > 0 && filled === total };
-    });
-  }, [user]);
 
   if (isLoading) {
     return (
@@ -575,13 +673,7 @@ export default function WebsiteWorkStatusPage() {
         </div>
       </div>
 
-      <Stepper progress={progress} />
-
-      <div className={cn("space-y-4", isFetching && "opacity-90")}>
-        {STAGE_CONFIGS.map((stage, i) => (
-          <StagePanel key={stage.step} stage={stage} user={user} progress={progress[i] ?? { filled: 0, total: 1, percent: 0, complete: false }} />
-        ))}
-      </div>
+      <Stepper user={user} isFetching={isFetching} />
     </div>
   );
 }
