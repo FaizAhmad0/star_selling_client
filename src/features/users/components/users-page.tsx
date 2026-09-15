@@ -55,7 +55,7 @@ export default function UsersPage() {
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = setTimeout(() => {
         updateParams({ search: value, page: "1" });
-      }, 400);
+      }, 700);
     },
     [updateParams]
   );
