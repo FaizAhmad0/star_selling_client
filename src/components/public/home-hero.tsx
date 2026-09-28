@@ -25,9 +25,9 @@ function SellingIllustration() {
       <div className="relative mx-4 mt-4 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xl shadow-primary/5">
         <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3">
           <div className="flex gap-1.5">
-            <span className="size-2 rounded-full bg-primary/60" />
-            <span className="size-2 rounded-full bg-primary/30" />
-            <span className="size-2 rounded-full bg-primary/15" />
+            <span className="size-2 rounded-full bg-red-500" />
+            <span className="size-2 rounded-full bg-yellow-500" />
+            <span className="size-2 rounded-full bg-green-500" />
           </div>
           <span className="hidden text-[9px] font-medium tracking-[0.12em] text-muted-foreground sm:inline">
             THE MAKER&apos;S EDIT

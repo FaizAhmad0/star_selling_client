@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Star Selling",
+  title: "Star Sellingz",
   description: "Created by start selling",
 };
 
