@@ -49,7 +49,7 @@ export function PublicNavbar() {
       >
         Skip to content
       </a>
-      <div className="mx-auto flex h-20 max-w-[1360px] items-center justify-between gap-5 px-5 sm:px-8">
+      <div className="mx-auto flex h-20 max-w-[1280px] items-center justify-between gap-5 px-5 sm:px-8">
         <Link
           href="/"
           aria-label="Star Sellingz home"
@@ -61,7 +61,7 @@ export function PublicNavbar() {
             alt="Logo"
             width={160}
             height={40}
-            className="h-14 w-auto object-contain"
+            className="h-11 w-auto object-contain sm:h-12"
             priority
           />
         </Link>
@@ -116,7 +116,7 @@ export function PublicNavbar() {
         <nav
           id="public-mobile-navigation"
           aria-label="Mobile navigation"
-          className="max-h-[calc(100dvh-5rem)] overflow-y-auto border-t border-border bg-background px-5 py-4 sm:px-8 xl:hidden"
+          className="max-h-[calc(100dvh-4rem-2px)] overflow-y-auto border-t border-border bg-background px-5 py-4 sm:px-8 xl:hidden"
         >
           {PUBLIC_NAV_ITEMS.map((item) => (
             <Link
