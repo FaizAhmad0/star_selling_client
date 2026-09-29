@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, type LucideIcon, MessageSquareQuote, Package, Sparkles, TrendingUp, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, type LucideIcon, Package } from "lucide-react";
 
 const sections = {
   products: {
@@ -9,38 +9,6 @@ const sections = {
     emptyTitle: "A new collection is on its way",
     emptyDescription: "Product listings will be available here soon. In the meantime, get to know the story behind Star Sellingz.",
     icon: Package,
-  },
-  margins: {
-    label: "Margins",
-    title: "See the potential behind every product.",
-    description: "A clearer view of pricing, costs, and the details that matter to your selling journey.",
-    emptyTitle: "Margin details are coming soon",
-    emptyDescription: "Product pricing and margin information will appear here when the collection is available.",
-    icon: TrendingUp,
-  },
-  achievements: {
-    label: "Achievements",
-    title: "Every step forward has a story.",
-    description: "A place to celebrate the milestones and people behind the Star Sellingz journey.",
-    emptyTitle: "Our milestones will be shared here",
-    emptyDescription: "Check back for updates, highlights, and achievements from our community.",
-    icon: Trophy,
-  },
-  testimonials: {
-    label: "Testimonials",
-    title: "Real people. Their own words.",
-    description: "Meet the voices behind the journey, through experiences shared by our community.",
-    emptyTitle: "Community stories are coming soon",
-    emptyDescription: "This space is reserved for testimonials from Star Sellingz customers and partners.",
-    icon: MessageSquareQuote,
-  },
-  "social-media-content": {
-    label: "Social Media Content",
-    title: "Give your brand a voice of its own.",
-    description: "A space for fresh ideas, product stories, and content that brings your presence to life.",
-    emptyTitle: "Fresh content is on its way",
-    emptyDescription: "Explore posts and creative resources here as they become available.",
-    icon: Sparkles,
   },
 } satisfies Record<string, { label: string; title: string; description: string; emptyTitle: string; emptyDescription: string; icon: LucideIcon }>;
 
