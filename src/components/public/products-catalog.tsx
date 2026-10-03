@@ -286,7 +286,7 @@ export function ProductsCatalog() {
   });
   const catalog = data?.data;
   function update(changes: Record<string, string>) {
-    const next = new URLSearchParams(queryString);
+    const next = new URLSearchParams("category" in changes ? "" : queryString);
     if (!("page" in changes)) next.delete("page");
     for (const [key, value] of Object.entries(changes)) {
       if (value) next.set(key, value);
@@ -324,12 +324,7 @@ export function ProductsCatalog() {
                 title={category.name}
                 aria-pressed={isActive}
                 onClick={() =>
-                  update({
-                    category: category._id,
-                    product: "",
-                    color: "",
-                    size: "",
-                  })
+                  update({ category: category._id })
                 }
                 className="group flex w-14 shrink-0 flex-col items-center gap-1.5 focus-visible:outline-none"
               >
