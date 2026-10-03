@@ -187,14 +187,100 @@ function Banner({
   );
 }
 
+function ProductDetails({ product, selectedColor, requestedSize, selectVariant, back }: {
+  product: Product;
+  selectedColor: string | null;
+  requestedSize: string | null;
+  selectVariant: (selection: { color: string; size: string }) => void;
+  back: () => void;
+}) {
+  const colorId = product.colors.find((color) => color.color === selectedColor)?._id ?? product.colors[0]?._id ?? "";
+  const [imageIndex, setImageIndex] = useState(0);
+  const color = product.colors.find((color) => color._id === colorId);
+  const variants = product.variants.filter((variant) => variant.colorId === colorId);
+  const sizes = Array.from(new Set(variants.map((variant) => variant.size)));
+  const selectedSize = requestedSize && sizes.includes(requestedSize) ? requestedSize : sizes[0] ?? "";
+  const variant = variants.find((variant) => variant.size === selectedSize);
+  const src = color?.images[imageIndex];
+  const price = variant?.estimatedSellingPrice ?? product.price;
+
+  return (
+    <section className="my-6" aria-label={`${product.title} details`}>
+      <button onClick={back} className="mb-5 flex items-center gap-1 text-sm text-primary">
+        <ChevronLeft className="size-4" /> Back to catalog
+      </button>
+      <div className="grid items-start gap-8 md:grid-cols-2">
+        <div className="min-w-0">
+          <CatalogImage key={src ?? colorId} src={src} alt={`${product.title}${color ? `, ${color.color}` : ""}`}
+            className="h-[600px] w-full rounded-xl border bg-muted/40 object-contain p-4" />
+          <div aria-label="Choose product image" className="mt-3 flex flex-wrap gap-2">
+            {color?.images.map((image, index) => (
+              <button key={`${image}-${index}`} onClick={() => setImageIndex(index)}
+                aria-label={`Show ${color.color} image ${index + 1}`} aria-pressed={imageIndex === index}
+                className={`size-[50px] shrink-0 overflow-hidden rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${imageIndex === index ? "border-primary ring-2 ring-primary" : "border-border"}`}>
+                <CatalogImage key={image} src={image} alt={`${product.title}, image ${index + 1}`} className="h-full w-full object-contain" />
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="min-w-0 rounded-xl border bg-card p-6 sm:p-8">
+          <p className="text-xs uppercase tracking-wider text-primary">{product.category?.name ?? "Collection"}</p>
+          <h1 className="mt-2 font-heading text-3xl font-semibold">{product.title}</h1>
+          <p className="mt-4 text-xl font-semibold">{price != null ? `Estimated ₹${price.toLocaleString("en-IN")}` : "Estimate on request"}</p>
+          <fieldset className="mt-6">
+            <legend className="text-sm font-semibold">Color{color ? `: ${color.color}` : ""}</legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {product.colors.map((option) => (
+                <button key={option._id} aria-pressed={colorId === option._id}
+                  onClick={() => {
+                    const availableSizes = product.variants.filter((variant) => variant.colorId === option._id).map((variant) => variant.size);
+                    selectVariant({ color: option.color, size: availableSizes.includes(selectedSize) ? selectedSize : availableSizes[0] ?? "" });
+                  }}
+                  className={`rounded-lg border px-4 py-2 text-sm capitalize ${colorId === option._id ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}>
+                  {option.color}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="mt-5">
+            <legend className="text-sm font-semibold">Size{selectedSize ? `: ${selectedSize}` : ""}</legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {sizes.map((option) => (
+                <button key={option} onClick={() => selectVariant({ color: color?.color ?? "", size: option })} aria-pressed={selectedSize === option}
+                  className={`min-w-12 rounded-lg border px-4 py-2 text-sm ${selectedSize === option ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}>
+                  {option}
+                </button>
+              ))}
+              {!sizes.length && <p className="text-sm text-muted-foreground">No sizes available for this color.</p>}
+            </div>
+          </fieldset>
+          <p aria-live="polite" className="mt-4 text-sm text-muted-foreground">
+            {variant ? variant.stock > 0 ? `${variant.stock} in stock` : "Out of stock" : "No variant available"}
+          </p>
+          <div className="mt-6 border-t pt-6 text-sm leading-6">
+            <h2 className="font-semibold">Product details</h2>
+            <p className="mt-2 whitespace-pre-line">{product.longDescription || product.shortDescription}</p>
+            <ul className="mt-3 list-inside list-disc">{product.bulletPoints.map((point, index) => <li key={index}>{point}</li>)}</ul>
+            {!!product.materials.length && <p className="mt-3">Materials: {product.materials.join(", ")}</p>}
+            {product.packageContents && <p className="mt-2">Package: {product.packageContents}</p>}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function ProductsCatalog() {
   const router = useRouter();
   const params = useSearchParams();
   const queryString = params.toString();
+  const selected = params.get("product");
+  // Load every option for the selected product; catalog filters must not hide its variants.
+  const catalogQuery = selected ? new URLSearchParams({ product: selected }).toString() : queryString;
   const { data, isPending, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ["catalog", queryString],
+    queryKey: ["catalog", catalogQuery],
     queryFn: ({ signal }) =>
-      apiGet<{ data: Catalog }>(`/products?${queryString}`, { signal }),
+      apiGet<{ data: Catalog }>(`/products?${catalogQuery}`, { signal }),
     staleTime: 60000,
     placeholderData: keepPreviousData,
   });
@@ -208,7 +294,7 @@ export function ProductsCatalog() {
     }
     router.push(`/products${next.size ? `?${next}` : ""}`, { scroll: false });
   }
-  const selected = params.get("product");
+  const selectedProduct = catalog?.products.find((product) => product._id === selected);
   return (
     <main className="mx-auto max-w-[1440px] px-4 pb-2 sm:px-8 lg:px-12">
       {/* <div className="mb-6 flex items-end justify-between">
@@ -302,11 +388,11 @@ export function ProductsCatalog() {
           </button>
         </form>
       </div>
-      <Banner
+      {!selected && <Banner
         banners={catalog?.banners ?? []}
         select={(id) => update({ product: id, color: "", size: "" })}
-      />
-      <div className="my-6 flex flex-wrap items-center gap-3">
+      />}
+      {!selected && <div className="my-6 flex flex-wrap items-center gap-3">
         <p className="mr-auto text-sm text-muted-foreground" aria-live="polite">
           {isPending ? "Loading products…" : `${catalog?.total ?? 0} products`}
           {isFetching && !isPending ? " · Updating…" : ""}
@@ -350,7 +436,7 @@ export function ProductsCatalog() {
             Clear filters
           </button>
         )}
-      </div>
+      </div>}
       {isError ? (
         <div role="alert" className="rounded-xl border p-10 text-center">
           <h2 className="font-semibold">Unable to load the catalog</h2>
@@ -362,7 +448,10 @@ export function ProductsCatalog() {
             Try again
           </button>
         </div>
-      ) : isPending ? (
+      ) : selected && selectedProduct ? (
+        <ProductDetails key={`${selectedProduct._id}-${params.get("color") ?? ""}`} product={selectedProduct} selectedColor={params.get("color")} requestedSize={params.get("size")} selectVariant={update}
+          back={() => update({ product: "", color: "", size: "" })} />
+      ) : isPending || (selected && isFetching) ? (
         <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           {Array.from({ length: 8 }, (_, i) => (
             <div
@@ -431,75 +520,11 @@ export function ProductsCatalog() {
                   </button>
                 ))}
               </div>
-              {selected === product._id && (
-                <div className="border-t p-4 text-xs leading-5">
-                  <div
-                    aria-label="Product images"
-                    className="mb-4 flex gap-2 overflow-x-auto"
-                  >
-                    {product.colors.flatMap((color) =>
-                      color.images.map((src, i) => (
-                        <CatalogImage
-                          key={`${color._id}-${i}`}
-                          src={src}
-                          alt={`${product.title}, ${color.color}, image ${i + 1}`}
-                          className="size-28 shrink-0 rounded-lg border object-contain"
-                        />
-                      )),
-                    )}
-                  </div>
-                  <h3 className="font-semibold">Product details</h3>
-                  <p className="mt-2 whitespace-pre-line">
-                    {product.longDescription || product.shortDescription}
-                  </p>
-                  <ul className="mt-2 list-inside list-disc">
-                    {product.bulletPoints.map((point, i) => (
-                      <li key={i}>{point}</li>
-                    ))}
-                  </ul>
-                  {product.materials.length > 0 && (
-                    <p className="mt-2">
-                      Materials: {product.materials.join(", ")}
-                    </p>
-                  )}
-                  {product.packageContents && (
-                    <p>Package: {product.packageContents}</p>
-                  )}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {product.variants.map((variant) => (
-                      <button
-                        key={variant._id}
-                        onClick={() =>
-                          update({
-                            size: variant.size,
-                            color:
-                              product.colors.find(
-                                (c) => c._id === variant.colorId,
-                              )?.color ?? "",
-                          })
-                        }
-                        className="rounded border px-2 py-1 hover:border-primary"
-                      >
-                        {variant.size} ·{" "}
-                        {variant.stock > 0
-                          ? `${variant.stock} in stock`
-                          : "Out of stock"}
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => update({ product: "" })}
-                    className="mt-3 text-primary"
-                  >
-                    Back to catalog
-                  </button>
-                </div>
-              )}
             </article>
           ))}
         </div>
       )}
-      {catalog && catalog.total > catalog.pageSize && (
+      {!selected && catalog && catalog.total > catalog.pageSize && (
         <nav
           aria-label="Product pagination"
           className="mt-8 flex items-center justify-center gap-5"
