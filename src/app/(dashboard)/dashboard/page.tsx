@@ -7,8 +7,8 @@ import { ShoppingCart, Globe, User, Mail, Hash } from "lucide-react";
 export default function DashboardPage() {
   const { user } = useAuthStore();
 
-  const hasAmazon = user?.platforms?.includes("amazon") ?? false;
-  const hasWebsite = user?.platforms?.includes("website") ?? false;
+  const hasAmazon = user?.platforms?.some((platform) => platform.name.toLowerCase() === "amazon") ?? false;
+  const hasWebsite = user?.platforms?.some((platform) => platform.name.toLowerCase() === "website") ?? false;
 
   return (
     <div className="space-y-6">

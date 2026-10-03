@@ -36,6 +36,48 @@ export interface User {
   tokenVersion: number;
   createdAt: string;
   updatedAt: string;
+
+  amazonEnrolled?: string;
+  callStatus?: string;
+  websiteFurtherProcess?: string;
+  personalInformationsForm?: string;
+  clientInformationForm?: string;
+  haveGst?: string;
+  furtherProcedureRecoding?: string;
+
+  domainName?: string;
+  domainStatus?: string;
+  idCard?: string;
+  leegality?: string;
+  performaInvoice?: string;
+
+  ovc?: string;
+  theme3?: string;
+  socialMedia1?: string;
+  banner50?: string;
+  supportPortal?: string;
+  gallery?: string;
+  logo?: string;
+  banner100?: string;
+  serverEmail?: string;
+
+  socialMediaPart2?: string;
+  categorySelection?: string;
+  domainReconfirmations?: string;
+  serverMailConfirmations?: string;
+
+  serverPurchase?: string;
+  websiteLive?: string;
+  paymentsStatus?: string;
+  handover?: string;
+  indianPgStatus?: string;
+  paypal?: string;
+
+  backendTransferred?: string;
+  gstInvoice?: string;
+  leegalityPdf?: string;
+  websiteRemark?: string;
+  aadharCard?: string;
 }
 
 export interface UserListResponse {

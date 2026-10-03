@@ -33,9 +33,9 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
   const [platformSearch, setPlatformSearch] = useState("");
   const [showPlatformDropdown, setShowPlatformDropdown] = useState(false);
 
-  const { data: platformsData } = usePlatforms({ limit: 100, status: "active" });
+  const { data: platformsData } = usePlatforms({ status: "active" });
   const platforms = useMemo(
-    () => platformsData?.data?.data ?? [],
+    () => platformsData?.data ?? [],
     [platformsData]
   );
 
@@ -107,7 +107,7 @@ export function EditUserModal({ open, onClose, user }: EditUserModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={handleClose} className="max-h-[90vh]">
+    <Modal open={open} onClose={handleClose}>
       <ModalHeader title="Edit User" description={`Update details for ${user?.name ?? ""}`} onClose={handleClose} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <ModalBody>
