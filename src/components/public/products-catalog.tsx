@@ -137,7 +137,7 @@ function Banner({
                   <button
                     tabIndex={index === i ? 0 : -1}
                     onClick={() => select(slide.product)}
-                    className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+                    className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground cursor-pointer"
                   >
                     Explore product
                   </button>
@@ -187,82 +187,161 @@ function Banner({
   );
 }
 
-function ProductDetails({ product, selectedColor, requestedSize, selectVariant, back }: {
+function ProductDetails({
+  product,
+  selectedColor,
+  requestedSize,
+  selectVariant,
+  back,
+}: {
   product: Product;
   selectedColor: string | null;
   requestedSize: string | null;
   selectVariant: (selection: { color: string; size: string }) => void;
   back: () => void;
 }) {
-  const colorId = product.colors.find((color) => color.color === selectedColor)?._id ?? product.colors[0]?._id ?? "";
+  const colorId =
+    product.colors.find((color) => color.color === selectedColor)?._id ??
+    product.colors[0]?._id ??
+    "";
   const [imageIndex, setImageIndex] = useState(0);
   const color = product.colors.find((color) => color._id === colorId);
-  const variants = product.variants.filter((variant) => variant.colorId === colorId);
+  const variants = product.variants.filter(
+    (variant) => variant.colorId === colorId,
+  );
   const sizes = Array.from(new Set(variants.map((variant) => variant.size)));
-  const selectedSize = requestedSize && sizes.includes(requestedSize) ? requestedSize : sizes[0] ?? "";
+  const selectedSize =
+    requestedSize && sizes.includes(requestedSize)
+      ? requestedSize
+      : (sizes[0] ?? "");
   const variant = variants.find((variant) => variant.size === selectedSize);
   const src = color?.images[imageIndex];
   const price = variant?.estimatedSellingPrice ?? product.price;
 
   return (
     <section className="my-6" aria-label={`${product.title} details`}>
-      <button onClick={back} className="mb-5 flex items-center gap-1 text-sm text-primary">
+      <button
+        onClick={back}
+        className="mb-5 flex items-center gap-1 text-sm text-primary"
+      >
         <ChevronLeft className="size-4" /> Back to catalog
       </button>
       <div className="grid items-start gap-8 md:grid-cols-2">
         <div className="min-w-0">
-          <CatalogImage key={src ?? colorId} src={src} alt={`${product.title}${color ? `, ${color.color}` : ""}`}
-            className="h-[600px] w-full rounded-xl border bg-muted/40 object-contain p-4" />
-          <div aria-label="Choose product image" className="mt-3 flex flex-wrap gap-2">
+          <CatalogImage
+            key={src ?? colorId}
+            src={src}
+            alt={`${product.title}${color ? `, ${color.color}` : ""}`}
+            className="h-[600px] w-full rounded-xl border bg-muted/40 object-contain p-4"
+          />
+          <div
+            aria-label="Choose product image"
+            className="mt-3 flex flex-wrap gap-2"
+          >
             {color?.images.map((image, index) => (
-              <button key={`${image}-${index}`} onClick={() => setImageIndex(index)}
-                aria-label={`Show ${color.color} image ${index + 1}`} aria-pressed={imageIndex === index}
-                className={`size-[50px] shrink-0 overflow-hidden rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${imageIndex === index ? "border-primary ring-2 ring-primary" : "border-border"}`}>
-                <CatalogImage key={image} src={image} alt={`${product.title}, image ${index + 1}`} className="h-full w-full object-contain" />
+              <button
+                key={`${image}-${index}`}
+                onClick={() => setImageIndex(index)}
+                aria-label={`Show ${color.color} image ${index + 1}`}
+                aria-pressed={imageIndex === index}
+                className={`size-[50px] shrink-0 overflow-hidden rounded-md border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${imageIndex === index ? "border-primary ring-2 ring-primary" : "border-border"}`}
+              >
+                <CatalogImage
+                  key={image}
+                  src={image}
+                  alt={`${product.title}, image ${index + 1}`}
+                  className="h-full w-full object-contain"
+                />
               </button>
             ))}
           </div>
         </div>
         <div className="min-w-0 rounded-xl border bg-card p-6 sm:p-8">
-          <p className="text-xs uppercase tracking-wider text-primary">{product.category?.name ?? "Collection"}</p>
-          <h1 className="mt-2 font-heading text-3xl font-semibold">{product.title}</h1>
-          <p className="mt-4 text-xl font-semibold">{price != null ? `Estimated ₹${price.toLocaleString("en-IN")}` : "Estimate on request"}</p>
+          <p className="text-xs uppercase tracking-wider text-primary">
+            {product.category?.name ?? "Collection"}
+          </p>
+          <h1 className="mt-2 font-heading text-3xl font-semibold">
+            {product.title}
+          </h1>
+          <p className="mt-4 text-xl font-semibold">
+            {price != null
+              ? `Estimated ₹${price.toLocaleString("en-IN")}`
+              : "Estimate on request"}
+          </p>
           <fieldset className="mt-6">
-            <legend className="text-sm font-semibold">Color{color ? `: ${color.color}` : ""}</legend>
+            <legend className="text-sm font-semibold">
+              Color{color ? `: ${color.color}` : ""}
+            </legend>
             <div className="mt-2 flex flex-wrap gap-2">
               {product.colors.map((option) => (
-                <button key={option._id} aria-pressed={colorId === option._id}
+                <button
+                  key={option._id}
+                  aria-pressed={colorId === option._id}
                   onClick={() => {
-                    const availableSizes = product.variants.filter((variant) => variant.colorId === option._id).map((variant) => variant.size);
-                    selectVariant({ color: option.color, size: availableSizes.includes(selectedSize) ? selectedSize : availableSizes[0] ?? "" });
+                    const availableSizes = product.variants
+                      .filter((variant) => variant.colorId === option._id)
+                      .map((variant) => variant.size);
+                    selectVariant({
+                      color: option.color,
+                      size: availableSizes.includes(selectedSize)
+                        ? selectedSize
+                        : (availableSizes[0] ?? ""),
+                    });
                   }}
-                  className={`rounded-lg border px-4 py-2 text-sm capitalize ${colorId === option._id ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}>
+                  className={`rounded-lg border px-4 py-2 text-sm capitalize ${colorId === option._id ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}
+                >
                   {option.color}
                 </button>
               ))}
             </div>
           </fieldset>
           <fieldset className="mt-5">
-            <legend className="text-sm font-semibold">Size{selectedSize ? `: ${selectedSize}` : ""}</legend>
+            <legend className="text-sm font-semibold">
+              Size{selectedSize ? `: ${selectedSize}` : ""}
+            </legend>
             <div className="mt-2 flex flex-wrap gap-2">
               {sizes.map((option) => (
-                <button key={option} onClick={() => selectVariant({ color: color?.color ?? "", size: option })} aria-pressed={selectedSize === option}
-                  className={`min-w-12 rounded-lg border px-4 py-2 text-sm ${selectedSize === option ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}>
+                <button
+                  key={option}
+                  onClick={() =>
+                    selectVariant({ color: color?.color ?? "", size: option })
+                  }
+                  aria-pressed={selectedSize === option}
+                  className={`min-w-12 rounded-lg border px-4 py-2 text-sm ${selectedSize === option ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}
+                >
                   {option}
                 </button>
               ))}
-              {!sizes.length && <p className="text-sm text-muted-foreground">No sizes available for this color.</p>}
+              {!sizes.length && (
+                <p className="text-sm text-muted-foreground">
+                  No sizes available for this color.
+                </p>
+              )}
             </div>
           </fieldset>
           <p aria-live="polite" className="mt-4 text-sm text-muted-foreground">
-            {variant ? variant.stock > 0 ? `${variant.stock} in stock` : "Out of stock" : "No variant available"}
+            {variant
+              ? variant.stock > 0
+                ? `${variant.stock} in stock`
+                : "Out of stock"
+              : "No variant available"}
           </p>
           <div className="mt-6 border-t pt-6 text-sm leading-6">
             <h2 className="font-semibold">Product details</h2>
-            <p className="mt-2 whitespace-pre-line">{product.longDescription || product.shortDescription}</p>
-            <ul className="mt-3 list-inside list-disc">{product.bulletPoints.map((point, index) => <li key={index}>{point}</li>)}</ul>
-            {!!product.materials.length && <p className="mt-3">Materials: {product.materials.join(", ")}</p>}
-            {product.packageContents && <p className="mt-2">Package: {product.packageContents}</p>}
+            <p className="mt-2 whitespace-pre-line">
+              {product.longDescription || product.shortDescription}
+            </p>
+            <ul className="mt-3 list-inside list-disc">
+              {product.bulletPoints.map((point, index) => (
+                <li key={index}>{point}</li>
+              ))}
+            </ul>
+            {!!product.materials.length && (
+              <p className="mt-3">Materials: {product.materials.join(", ")}</p>
+            )}
+            {product.packageContents && (
+              <p className="mt-2">Package: {product.packageContents}</p>
+            )}
           </div>
         </div>
       </div>
@@ -276,7 +355,9 @@ export function ProductsCatalog() {
   const queryString = params.toString();
   const selected = params.get("product");
   // Load every option for the selected product; catalog filters must not hide its variants.
-  const catalogQuery = selected ? new URLSearchParams({ product: selected }).toString() : queryString;
+  const catalogQuery = selected
+    ? new URLSearchParams({ product: selected }).toString()
+    : queryString;
   const { data, isPending, isFetching, isError, error, refetch } = useQuery({
     queryKey: ["catalog", catalogQuery],
     queryFn: ({ signal }) =>
@@ -294,7 +375,9 @@ export function ProductsCatalog() {
     }
     router.push(`/products${next.size ? `?${next}` : ""}`, { scroll: false });
   }
-  const selectedProduct = catalog?.products.find((product) => product._id === selected);
+  const selectedProduct = catalog?.products.find(
+    (product) => product._id === selected,
+  );
   return (
     <main className="mx-auto max-w-[1440px] px-4 pb-2 sm:px-8 lg:px-12">
       {/* <div className="mb-6 flex items-end justify-between">
@@ -323,10 +406,8 @@ export function ProductsCatalog() {
                 key={category._id}
                 title={category.name}
                 aria-pressed={isActive}
-                onClick={() =>
-                  update({ category: category._id })
-                }
-                className="group flex w-14 shrink-0 flex-col items-center gap-1.5 focus-visible:outline-none"
+                onClick={() => update({ category: category._id })}
+                className="group flex w-14 shrink-0 flex-col items-center gap-1.5 focus-visible:outline-none cursor-pointer"
               >
                 <span
                   className={`flex size-[50px] items-center justify-center rounded-full border transition-all duration-200 group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-primary ${
@@ -383,55 +464,68 @@ export function ProductsCatalog() {
           </button>
         </form>
       </div>
-      {!selected && <Banner
-        banners={catalog?.banners ?? []}
-        select={(id) => update({ product: id, color: "", size: "" })}
-      />}
-      {!selected && <div className="my-6 flex flex-wrap items-center gap-3">
-        <p className="mr-auto text-sm text-muted-foreground" aria-live="polite">
-          {isPending ? "Loading products…" : `${catalog?.total ?? 0} products`}
-          {isFetching && !isPending ? " · Updating…" : ""}
-        </p>
-        {[
-          { key: "color", label: "All colors", options: catalog?.colors ?? [] },
-          { key: "size", label: "All sizes", options: catalog?.sizes ?? [] },
-          {
-            key: "sort",
-            label: "Newest first",
-            options: ["name", "price-asc", "price-desc"],
-          },
-        ].map(({ key, label, options }) => (
-          <select
-            key={key}
-            aria-label={key}
-            value={params.get(key) ?? (key === "sort" ? "newest" : "")}
-            onChange={(e) => update({ [key]: e.target.value })}
-            className="h-10 rounded-lg border bg-background px-3 text-sm capitalize"
+      {!selected && (
+        <Banner
+          banners={catalog?.banners ?? []}
+          select={(id) => update({ product: id, color: "", size: "" })}
+        />
+      )}
+      {!selected && (
+        <div className="my-6 flex flex-wrap items-center gap-3">
+          <p
+            className="mr-auto text-sm text-muted-foreground"
+            aria-live="polite"
           >
-            <option value={key === "sort" ? "newest" : ""}>{label}</option>
-            {options.map((option) => (
-              <option key={option} value={option}>
-                {(
-                  {
-                    name: "Name A–Z",
-                    "price-asc": "Estimate: low to high",
-                    "price-desc": "Estimate: high to low",
-                  } as Record<string, string>
-                )[option] ?? option}
-              </option>
-            ))}
-          </select>
-        ))}
-        {queryString && (
-          <button
-            onClick={() => router.push("/products", { scroll: false })}
-            className="flex items-center gap-1 text-sm text-primary"
-          >
-            <X className="size-4" />
-            Clear filters
-          </button>
-        )}
-      </div>}
+            {isPending
+              ? "Loading products…"
+              : `${catalog?.total ?? 0} products`}
+            {isFetching && !isPending ? " · Updating…" : ""}
+          </p>
+          {[
+            {
+              key: "color",
+              label: "All colors",
+              options: catalog?.colors ?? [],
+            },
+            { key: "size", label: "All sizes", options: catalog?.sizes ?? [] },
+            {
+              key: "sort",
+              label: "Newest first",
+              options: ["name", "price-asc", "price-desc"],
+            },
+          ].map(({ key, label, options }) => (
+            <select
+              key={key}
+              aria-label={key}
+              value={params.get(key) ?? (key === "sort" ? "newest" : "")}
+              onChange={(e) => update({ [key]: e.target.value })}
+              className="h-10 rounded-lg border bg-background px-3 text-sm capitalize"
+            >
+              <option value={key === "sort" ? "newest" : ""}>{label}</option>
+              {options.map((option) => (
+                <option key={option} value={option}>
+                  {(
+                    {
+                      name: "Name A–Z",
+                      "price-asc": "Estimate: low to high",
+                      "price-desc": "Estimate: high to low",
+                    } as Record<string, string>
+                  )[option] ?? option}
+                </option>
+              ))}
+            </select>
+          ))}
+          {queryString && (
+            <button
+              onClick={() => router.push("/products", { scroll: false })}
+              className="flex items-center gap-1 text-sm text-primary"
+            >
+              <X className="size-4" />
+              Clear filters
+            </button>
+          )}
+        </div>
+      )}
       {isError ? (
         <div role="alert" className="rounded-xl border p-10 text-center">
           <h2 className="font-semibold">Unable to load the catalog</h2>
@@ -444,8 +538,14 @@ export function ProductsCatalog() {
           </button>
         </div>
       ) : selected && selectedProduct ? (
-        <ProductDetails key={`${selectedProduct._id}-${params.get("color") ?? ""}`} product={selectedProduct} selectedColor={params.get("color")} requestedSize={params.get("size")} selectVariant={update}
-          back={() => update({ product: "", color: "", size: "" })} />
+        <ProductDetails
+          key={`${selectedProduct._id}-${params.get("color") ?? ""}`}
+          product={selectedProduct}
+          selectedColor={params.get("color")}
+          requestedSize={params.get("size")}
+          selectVariant={update}
+          back={() => update({ product: "", color: "", size: "" })}
+        />
       ) : isPending || (selected && isFetching) ? (
         <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           {Array.from({ length: 8 }, (_, i) => (
@@ -468,10 +568,10 @@ export function ProductsCatalog() {
           {catalog.products.map((product) => (
             <article
               key={product._id}
-              className="overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-lg hover:shadow-primary/5"
+              className="overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-lg hover:shadow-primary/20 hover:cursor-pointer"
             >
               <button
-                className="block w-full text-left"
+                className="block w-full text-left cursor-pointer"
                 onClick={() => update({ product: product._id })}
                 aria-label={`View ${product.title}`}
               >
@@ -479,7 +579,7 @@ export function ProductsCatalog() {
                   key={product.colors[0]?.images[0]}
                   src={product.colors[0]?.images[0]}
                   alt={product.title}
-                  className="aspect-square w-full bg-muted/40 object-contain p-4"
+                  className="aspect-square w-full bg-muted/40 object-cover"
                 />
                 <div className="p-4">
                   <p className="text-[10px] font-medium uppercase tracking-wider text-primary">
@@ -491,14 +591,14 @@ export function ProductsCatalog() {
                   <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">
                     {product.shortDescription}
                   </p>
-                  <p className="mt-3 text-sm font-semibold">
+                  {/* <p className="mt-3 text-sm font-semibold">
                     {product.price != null
                       ? `Estimated ₹${product.price.toLocaleString("en-IN")}`
                       : "Estimate on request"}
-                  </p>
+                  </p> */}
                 </div>
               </button>
-              <div className="flex flex-wrap gap-1 border-t px-4 py-3">
+              {/* <div className="flex flex-wrap gap-1 border-t px-4 py-3">
                 {product.colors.map((color) => (
                   <button
                     key={color._id}
@@ -509,12 +609,12 @@ export function ProductsCatalog() {
                         size: "",
                       })
                     }
-                    className="rounded border px-2 py-1 text-[10px] capitalize hover:border-primary"
+                    className="rounded border px-2 py-1 text-[10px] capitalize hover:border-primary cursor-pointer"
                   >
                     {color.color}
                   </button>
                 ))}
-              </div>
+              </div> */}
             </article>
           ))}
         </div>
