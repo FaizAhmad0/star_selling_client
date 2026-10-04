@@ -147,7 +147,7 @@ function Banner({
                 key={slide?.image}
                 src={slide?.image ?? `/catalog-banner-${i + 1}.svg`}
                 alt={`Featured collection ${i + 1}`}
-                className="h-64 w-full object-contain p-6 sm:h-80"
+                className="h-64 w-full object-contain sm:h-80 [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]"
               />
             </div>
           </div>
