@@ -598,10 +598,10 @@ export function ProductsCatalog() {
           {catalog.products.map((product) => (
             <article
               key={product._id}
-              className="overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-lg hover:shadow-primary/20 hover:cursor-pointer"
+              className="group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/25 hover:shadow-lg hover:shadow-primary/10 focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/20"
             >
               <button
-                className="block w-full text-left cursor-pointer"
+                className="flex h-full w-full cursor-pointer flex-col text-left focus-visible:outline-none"
                 onClick={() => update({ product: product._id })}
                 aria-label={`View ${product.title}`}
               >
@@ -609,16 +609,16 @@ export function ProductsCatalog() {
                   key={product.colors[0]?.images[0]}
                   src={product.colors[0]?.images[0]}
                   alt={product.title}
-                  className="aspect-square w-full bg-muted/40 object-cover"
+                  className="aspect-square w-full shrink-0 bg-muted/40 object-cover"
                 />
-                <div className="p-4">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-primary">
+                <div className="flex w-full flex-1 flex-col items-start p-4 sm:p-5">
+                  <p className="max-w-full rounded-md bg-primary/5 px-2 py-1 text-[10px] font-semibold uppercase leading-4 tracking-wider text-primary">
                     {product.category?.name ?? "Collection"}
                   </p>
-                  <h2 className="mt-1 line-clamp-2 text-sm font-semibold">
+                  <h2 className="mt-3 line-clamp-2 min-h-10 text-sm font-semibold leading-5 tracking-tight transition-colors duration-300 group-hover:text-primary">
                     {product.title}
                   </h2>
-                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">
+                  <p className="mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-muted-foreground">
                     {product.shortDescription}
                   </p>
                   {/* <p className="mt-3 text-sm font-semibold">
