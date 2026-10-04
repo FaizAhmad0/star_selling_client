@@ -29,7 +29,10 @@ type Product = {
     colorId: string;
     size: string;
     stock: number;
+    estimatedCostPrice: number | null;
     estimatedSellingPrice: number | null;
+    estimatedCostPriceOOI: number | null;
+    estimatedSalePriceOOI: number | null;
   }[];
 };
 type Catalog = {
@@ -216,7 +219,6 @@ function ProductDetails({
       : (sizes[0] ?? "");
   const variant = variants.find((variant) => variant.size === selectedSize);
   const src = color?.images[imageIndex];
-  const price = variant?.estimatedSellingPrice ?? product.price;
 
   return (
     <section className="my-6" aria-label={`${product.title} details`}>
@@ -263,11 +265,39 @@ function ProductDetails({
           <h1 className="mt-2 font-heading text-3xl font-semibold">
             {product.title}
           </h1>
-          <p className="mt-4 text-xl font-semibold">
-            {price != null
-              ? `Estimated ₹${price.toLocaleString("en-IN")}`
-              : "Estimate on request"}
-          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {[
+              {
+                region: "India",
+                cost: variant?.estimatedCostPrice,
+                selling: variant?.estimatedSellingPrice,
+              },
+              {
+                region: "Outside India",
+                cost: variant?.estimatedCostPriceOOI,
+                selling: variant?.estimatedSalePriceOOI,
+              },
+            ].map(({ region, cost, selling }) => (
+              <div key={region}>
+                <h2 className="text-sm font-semibold">{region}</h2>
+                <dl className="mt-2 space-y-2 text-sm">
+                  {[
+                    { label: "Estimated cost price", value: cost },
+                    { label: "Estimated selling price", value: selling },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <dt className="text-muted-foreground">{label}</dt>
+                      <dd className="font-semibold">
+                        {value != null
+                          ? `₹${value.toLocaleString("en-IN")}`
+                          : "Estimate on request"}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
           <fieldset className="mt-6">
             <legend className="text-sm font-semibold">
               Color{color ? `: ${color.color}` : ""}
