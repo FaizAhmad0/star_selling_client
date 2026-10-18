@@ -25,6 +25,7 @@ export default function Home() {
   return (
     <PublicLayout>
       <HomeHero />
+      {/* here */}
     </PublicLayout>
   );
 }

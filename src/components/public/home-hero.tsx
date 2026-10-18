@@ -1,174 +1,239 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   ArrowUpRight,
-  Check,
+  ChevronLeft,
+  ChevronRight,
   Globe2,
   Package,
+  Pause,
+  Play,
   Sparkles,
   TrendingUp,
 } from "lucide-react";
+import { apiGet } from "@/lib/axios";
+
+type Catalog = {
+  banners: { image: string; product: string }[];
+  products: { _id: string; title: string }[];
+};
+
+function ProductImage({ src, alt }: { src: string; alt: string }) {
+  const [broken, setBroken] = useState(false);
+
+  if (broken || !/^(https?:\/\/|\/(?!\/))/.test(src)) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-muted">
+        <Package className="size-12 text-primary/30" aria-label={alt} />
+      </div>
+    );
+  }
+
+  // Featured image hosts come from the catalog, just as on /products.
+  /* eslint-disable @next/next/no-img-element */
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="absolute inset-0 h-full w-full object-cover object-center"
+      onError={() => setBroken(true)}
+    />
+  );
+  /* eslint-enable @next/next/no-img-element */
+}
 
 function SellingIllustration() {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [interacting, setInteracting] = useState(false);
+  const { data, isPending, isError, refetch } = useQuery({
+    queryKey: ["catalog", ""],
+    queryFn: ({ signal }) =>
+      apiGet<{ data: Catalog }>("/products?", { signal }),
+    staleTime: 60000,
+  });
+  const slides = (data?.data.banners ?? []).slice(0, 5);
+  const count = slides.length;
+  const activeIndex = count ? index % count : 0;
+
+  useEffect(() => {
+    if (count < 2 || paused || interacting) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let timer: ReturnType<typeof setInterval> | undefined;
+    function syncTimer() {
+      clearInterval(timer);
+      if (!reducedMotion.matches) {
+        timer = setInterval(
+          () => setIndex((current) => (current + 1) % count),
+          1000,
+        );
+      }
+    }
+    syncTimer();
+    reducedMotion.addEventListener("change", syncTimer);
+    return () => {
+      clearInterval(timer);
+      reducedMotion.removeEventListener("change", syncTimer);
+    };
+  }, [count, paused, interacting]);
+
   return (
-    <div
-      className="relative mx-auto w-full max-w-[460px] pb-8 pt-3 sm:px-3"
-      aria-hidden="true"
+    <section
+      aria-label="Featured products"
+      aria-roledescription="carousel"
+      aria-busy={isPending}
+      className="relative order-1 mx-auto w-full min-w-0 max-w-[460px] sm:overflow-hidden sm:rounded-2xl sm:border sm:border-border/80 sm:bg-card sm:shadow-[0_20px_60px_-20px_rgba(15,23,42,0.2)] lg:order-2"
     >
-      <div className="absolute inset-x-3 inset-y-0 rounded-[2.5rem] bg-primary/[0.055] sm:inset-x-0 sm:rotate-3" />
-      <div className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
-        <div className="absolute -right-16 -top-20 size-80 rounded-full border border-primary/10" />
-        <div className="absolute -right-8 -top-12 size-64 rounded-full border border-primary/10" />
-        <div className="absolute -bottom-24 -left-20 size-64 rounded-full border border-primary/10" />
-      </div>
-
-      <div className="relative mx-4 mt-4 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xl shadow-primary/5">
-        <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3">
-          <div className="flex gap-1.5">
-            <span className="size-2 rounded-full bg-red-500" />
-            <span className="size-2 rounded-full bg-yellow-500" />
-            <span className="size-2 rounded-full bg-green-500" />
-          </div>
-          <span className="hidden text-[9px] font-medium tracking-[0.12em] text-muted-foreground sm:inline">
-            THE MAKER&apos;S EDIT
-          </span>
+      <div className="relative hidden h-12 items-center justify-between border-b border-border/70 bg-muted/40 px-4 sm:flex">
+        <div className="invisible flex items-center gap-1.5 sm:visible" aria-hidden="true">
+          <span className="size-2.5 rounded-full border border-black/5 bg-[#ff5f57]" />
+          <span className="size-2.5 rounded-full border border-black/5 bg-[#febc2e]" />
+          <span className="size-2.5 rounded-full border border-black/5 bg-[#28c840]" />
         </div>
-
-        <div className="p-4 sm:p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[9px] font-semibold tracking-[0.12em] text-primary">
-                SMALL BEGINNINGS. BIG POSSIBILITIES.
-              </p>
-              <p className="mt-2 font-heading text-xl font-semibold leading-tight tracking-tight sm:text-2xl">
-                Made with care.
-                <br />
-                Ready for the world.
-              </p>
-            </div>
-            <Sparkles
-              className="mt-1 size-5 shrink-0 text-primary/60"
-              strokeWidth={1.3}
+        <p className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:text-[10px]">
+          The Star Sellingz Edit
+        </p>
+        <Package
+          className="size-3.5 text-muted-foreground/50"
+          aria-hidden="true"
+        />
+      </div>
+      {isPending ? (
+        <div
+          role="status"
+          className="mx-4 grid aspect-[4/3] grid-cols-5 items-center gap-2"
+        >
+          <span className="sr-only">Loading featured products...</span>
+          {Array.from({ length: 5 }, (_, position) => (
+            <div
+              key={position}
+              className="aspect-[3/4] w-full -skew-y-3 animate-pulse rounded-lg bg-muted motion-reduce:animate-none"
             />
-          </div>
-
-          <div className="mt-4 grid grid-cols-[1.15fr_1fr] gap-3">
-            <div className="relative flex h-32 items-end justify-center overflow-hidden rounded-xl bg-primary/10 pb-2 sm:h-36 lg:h-[clamp(6rem,18svh,9rem)]">
-              <span className="absolute left-3 top-2 text-[8px] font-semibold uppercase tracking-widest text-primary/70">
-                Crafted with care
-              </span>
-              <svg
-                viewBox="0 0 180 180"
-                className="h-[82%] w-auto max-w-full text-primary"
-                fill="none"
-              >
-                <ellipse
-                  cx="92"
-                  cy="163"
-                  rx="54"
-                  ry="7"
-                  fill="currentColor"
-                  opacity=".1"
-                />
-                <path
-                  d="M71 31h38v26c0 18 41 36 41 71 0 24-20 34-60 34s-60-10-60-34c0-35 41-53 41-71V31Z"
-                  fill="currentColor"
-                  opacity=".75"
-                />
-                <path
-                  d="M71 31h38v26c0 18 41 36 41 71 0 24-20 34-60 34V31Z"
-                  fill="currentColor"
-                  opacity=".35"
-                />
-                <ellipse cx="90" cy="31" rx="19" ry="6" fill="currentColor" />
-                <path
-                  d="M51 105c23 9 55 9 79 0M46 124c26 9 60 9 88 0M50 144c24 7 53 7 78 0"
-                  stroke="var(--primary-foreground)"
-                  strokeOpacity=".3"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
-            <div className="flex h-32 items-end justify-center overflow-hidden rounded-xl bg-muted pb-2 sm:h-36 lg:h-[clamp(6rem,18svh,9rem)]">
-              <svg
-                viewBox="0 0 160 180"
-                className="h-[85%] w-auto max-w-full text-primary"
-                fill="none"
-              >
-                <ellipse
-                  cx="80"
-                  cy="163"
-                  rx="56"
-                  ry="7"
-                  fill="currentColor"
-                  opacity=".08"
-                />
-                <path
-                  d="M27 61h105l10 99H17L27 61Z"
-                  fill="var(--background)"
-                  stroke="currentColor"
-                  strokeOpacity=".14"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M54 69V46c0-35 51-35 51 0v23"
-                  stroke="currentColor"
-                  strokeWidth="9"
-                  strokeLinecap="round"
-                  opacity=".65"
-                />
-                <path
-                  d="m80 88 6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2 6-13Z"
-                  fill="currentColor"
-                  opacity=".8"
-                />
-                <path
-                  d="M29 148h100"
-                  stroke="currentColor"
-                  strokeOpacity=".15"
-                  strokeWidth="2"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-between gap-3 border-t border-border/70 pt-3">
-            <span className="text-[10px] text-muted-foreground">
-              From local makers to new markets
-            </span>
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <ArrowUpRight className="size-3.5" />
-            </span>
-          </div>
+          ))}
         </div>
-      </div>
-
-      <div className="absolute right-0 top-0 flex items-center gap-2.5 rounded-xl border border-border/80 bg-background p-2.5 shadow-lg shadow-primary/5 sm:px-3">
-        <span className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Globe2 className="size-4" strokeWidth={1.5} />
-        </span>
-        <div>
-          <p className="text-[11px] font-semibold">Local to global</p>
-          <p className="mt-0.5 text-[9px] text-muted-foreground">
-            A world of opportunity
+      ) : isError || !count ? (
+        <div className="flex aspect-[4/3] flex-col items-center justify-center gap-4 px-6 text-center">
+          <p className="text-muted-foreground" role="status">
+            {isError
+              ? "Unable to load featured products."
+              : "Featured products are coming soon."}
           </p>
+          {isError ? (
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
+            >
+              Try again
+            </button>
+          ) : (
+            <Link
+              href="/products"
+              className="text-sm font-semibold text-primary underline underline-offset-4"
+            >
+              Explore products
+            </Link>
+          )}
         </div>
-      </div>
-      <div className="absolute bottom-0 left-0 flex w-fit items-center gap-3 rounded-xl border border-border/80 bg-background px-3 py-2.5 shadow-lg shadow-primary/5 sm:px-4">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-          <TrendingUp className="size-4" />
-        </span>
-        <div>
-          <p className="text-[11px] font-semibold">Your ambition. In motion.</p>
-          <p className="mt-1 text-[9px] text-muted-foreground">
-            Discover. Build. Grow.
-          </p>
+      ) : (
+        <div
+          className="sm:bg-gradient-to-b sm:from-muted/20 sm:via-background sm:to-primary/[0.04]"
+          onMouseEnter={() => setInteracting(true)}
+          onMouseLeave={() => setInteracting(false)}
+          onFocusCapture={() => setInteracting(true)}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget))
+              setInteracting(false);
+          }}
+        >
+          <div className="relative mx-4 aspect-[4/3] isolate">
+            {slides.map((slide, position) => {
+              const offset =
+                ((position - activeIndex + count + Math.floor(count / 2)) %
+                  count) -
+                Math.floor(count / 2);
+              const title =
+                data?.data.products.find(
+                  (product) => product._id === slide.product,
+                )?.title ?? `Featured product ${position + 1}`;
+
+              return (
+                <Link
+                  key={`${slide.product}-${slide.image}-${position}`}
+                  href={`/products?product=${encodeURIComponent(slide.product)}`}
+                  aria-label={`Explore ${title}`}
+                  aria-current={offset === 0 ? "true" : undefined}
+                  className="absolute left-1/2 top-1/2 block aspect-[3/4] w-[36%] overflow-hidden rounded-xl bg-muted shadow-[0_12px_24px_-10px_rgba(15,23,42,0.3)] ring-1 ring-black/5 transition-transform duration-500 ease-out focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary motion-reduce:transition-none"
+                  style={{
+                    zIndex: count - Math.abs(offset),
+                    transform: `translate(-50%, -50%) translateX(${offset * 38}%) translateY(${Math.abs(offset) * 5}%) rotate(${offset * 4 - 2}deg) skewY(-2deg) scale(${1 - Math.abs(offset) * 0.06})`,
+                  }}
+                >
+                  <ProductImage
+                    key={slide.image}
+                    src={slide.image}
+                    alt={title}
+                  />
+                </Link>
+              );
+            })}
+          </div>
+          {count > 1 && (
+            <div className="relative z-10 hidden items-center justify-center gap-1 border-t border-border/60 bg-background/80 px-2 py-3 sm:flex sm:gap-2">
+              <button
+                type="button"
+                aria-label="Previous product"
+                onClick={() => setIndex((activeIndex + count - 1) % count)}
+                className="flex size-8 items-center justify-center rounded-full hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <div className="flex items-center gap-0.5 sm:gap-1">
+                {slides.map((_, position) => (
+                  <button
+                    key={position}
+                    type="button"
+                    aria-label={`Show product ${position + 1}`}
+                    aria-current={activeIndex === position ? "true" : undefined}
+                    onClick={() => setIndex(position)}
+                    className="flex size-6 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-primary"
+                  >
+                    <span
+                      className={`h-2 rounded-full ${activeIndex === position ? "w-5 bg-primary" : "w-2 bg-primary/25"}`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                aria-label="Next product"
+                onClick={() => setIndex((activeIndex + 1) % count)}
+                className="flex size-8 items-center justify-center rounded-full hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+              <button
+                type="button"
+                aria-label={paused ? "Play carousel" : "Pause carousel"}
+                onClick={() => setPaused((current) => !current)}
+                className="flex size-8 items-center justify-center rounded-full hover:bg-primary/10 focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                {paused ? (
+                  <Play className="size-4" />
+                ) : (
+                  <Pause className="size-4" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
-        <span className="ml-2 flex size-5 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Check className="size-3" strokeWidth={3} />
-        </span>
-      </div>
-    </div>
+      )}
+    </section>
   );
 }
 
@@ -206,29 +271,34 @@ export function HomeHero() {
         className="pointer-events-none absolute -left-64 top-0 size-[500px] rounded-full bg-primary/[0.025] blur-3xl"
         aria-hidden="true"
       />
-      <div className="relative mx-auto max-w-[1150px] px-5 pb-6 pt-9 sm:px-8 lg:px-12 lg:py-6">
-        <div className="grid items-center gap-10 lg:min-h-[min(520px,calc(100svh-216px))] lg:grid-cols-2 lg:gap-6 pt-12">
-          <div className="min-w-0 max-w-xl">
-            <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary sm:text-xs">
-              <span className="h-px w-8 bg-primary" aria-hidden="true" /> Rooted
-              in craft. Ready for more.
+      <div className="relative mx-auto max-w-[1150px] px-5 pb-6 pt-2 sm:px-8 lg:px-12 ">
+        <div className="grid items-center gap-10 pt-8 lg:min-h-[min(520px,calc(100svh-216px))] lg:grid-cols-2 lg:gap-6">
+          <div className="order-2 min-w-0 max-w-xl lg:order-1 lg:pr-4">
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-primary/10 bg-primary/[0.04] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.13em] text-primary sm:text-[10px]">
+              <Sparkles
+                className="size-3.5 shrink-0"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+              Empowering local. Thinking global.
             </div>
             <h1
               id="hero-heading"
-              className="mt-5 font-heading text-[clamp(2.5rem,4.4vw,3.5rem)] font-semibold leading-[1.1] tracking-[-0.055em]"
+              className="mt-6 text-balance font-heading text-[clamp(2.25rem,3.5vw,3rem)] font-semibold leading-[1.1] tracking-[-0.045em]"
             >
-              Local craft.
+              Where Local Craft Meets
               <br />
-              <span className="text-primary">Global possibility.</span>
+              <span className="text-primary">Global Opportunities.</span>
             </h1>
-            <p className="mt-5 max-w-[440px] text-[15px] leading-7 text-muted-foreground sm:text-base">
-              Big journeys start with a single idea. Discover products, explore
-              your potential, and take your next step with Star Sellingz.
+            <p className="mt-6 max-w-[390px] text-[15px] leading-[1.8] text-muted-foreground">
+              Discover unique products crafted by talented Indian artisans.
+              Explore new opportunities, grow your business, and bring local
+              craftsmanship to customers worldwide.
             </p>
-            <div className="mt-6 flex flex-col gap-3 min-[380px]:flex-row sm:gap-4">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/products"
-                className="group inline-flex min-h-12 items-center justify-center gap-5 rounded-lg bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/15 transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                className="group inline-flex min-h-12 items-center justify-center gap-6 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-[0_6px_18px_-6px_var(--primary)] transition-[background-color,box-shadow] hover:bg-primary/90 hover:shadow-[0_8px_22px_-6px_var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
               >
                 Explore Products{" "}
                 <ArrowUpRight
@@ -238,20 +308,24 @@ export function HomeHero() {
               </Link>
               <Link
                 href="/about"
-                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-lg border border-border bg-background px-6 text-sm font-semibold transition-colors hover:border-primary/30 hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                className="group inline-flex min-h-12 items-center justify-center gap-4 rounded-xl border border-border/80 bg-background px-5 text-sm font-medium text-foreground/80 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
               >
-                Our Story <ArrowRight className="size-4" aria-hidden="true" />
+                Discover Our Story
+                <ArrowRight
+                  className="size-4 transition-transform motion-safe:group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </Link>
             </div>
-            <div className="mt-5 flex items-center gap-3 text-xs leading-5 text-muted-foreground">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-primary/15 bg-primary/5">
+            <div className="mt-7 flex max-w-[390px] items-center gap-3 border-t border-border/70 pt-5 text-[11px] leading-5 text-muted-foreground">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/[0.05]">
                 <Globe2
                   className="size-4 text-primary"
                   strokeWidth={1.5}
                   aria-hidden="true"
                 />
               </span>
-              Bridging local artisans to global markets.
+              Bridging Indian craftsmanship with global markets.
             </div>
           </div>
           <SellingIllustration />
