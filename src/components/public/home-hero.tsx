@@ -90,7 +90,7 @@ const nextSteps = [
 ];
 
 export function HomeHero() {
-  const [slidePosition, setSlidePosition] = useState(heroSlides.length);
+  const [slidePosition, setSlidePosition] = useState<number>(heroSlides.length);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
   useEffect(() => {
     const timer = window.setInterval(() => {
