@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { useCurrentUser } from "@/features/auth/hooks/use-auth";
 import { HomeHero } from "@/components/public/home-hero";
+import { HomeProducts } from "@/components/public/home-products";
 import { PublicLayout } from "@/components/public/public-layout";
 import { ROLE_DASHBOARD } from "@/components/public/public-navigation";
 
@@ -25,7 +26,7 @@ export default function Home() {
   return (
     <PublicLayout>
       <HomeHero />
-      {/* here */}
+      <HomeProducts />
     </PublicLayout>
   );
 }
