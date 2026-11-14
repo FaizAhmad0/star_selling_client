@@ -3,32 +3,18 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Package, Plus } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowRight, Package } from "lucide-react";
 import { apiGet } from "@/lib/axios";
 
 type Product = {
   _id: string;
   title: string;
+  shortDescription: string;
   price: number | null;
   colors: { images: string[] }[];
-  variants: {
-    _id: string;
-    size: string;
-    stock: number;
-    estimatedSellingPrice: number | null;
-  }[];
 };
 
 type Catalog = { products: Product[] };
-type CartLine = {
-  productId: string;
-  variantId: string;
-  title: string;
-  size: string;
-  price: number | null;
-  quantity: number;
-};
 
 const cardColors = ["#e8eae3", "#eee5dc", "#e5e8e8", "#eae7dc", "#ebe7eb"];
 
@@ -61,35 +47,6 @@ function HomeProductImage({ product, index }: { product: Product; index: number 
     />
   );
   /* eslint-enable @next/next/no-img-element */
-}
-
-function addToCart(product: Product) {
-  const variant = product.variants.find((item) => item.stock > 0);
-  if (!variant) {
-    toast.error("This product is currently out of stock.");
-    return;
-  }
-
-  try {
-    const saved = window.localStorage.getItem("star-sellingz-cart");
-    const cart: CartLine[] = saved ? JSON.parse(saved) : [];
-    const existing = cart.find((line) => line.variantId === variant._id);
-    if (existing) existing.quantity += 1;
-    else {
-      cart.push({
-        productId: product._id,
-        variantId: variant._id,
-        title: product.title,
-        size: variant.size,
-        price: variant.estimatedSellingPrice ?? product.price,
-        quantity: 1,
-      });
-    }
-    window.localStorage.setItem("star-sellingz-cart", JSON.stringify(cart));
-    toast.success(`${product.title} added to cart`);
-  } catch {
-    toast.error("Unable to add this product to your cart.");
-  }
 }
 
 export function HomeProducts() {
@@ -200,22 +157,16 @@ export function HomeProducts() {
                     <HomeProductImage product={product} index={index} />
                   </div>
                 </Link>
-                <div className="flex items-start justify-between gap-2 px-0.5 pt-3">
+                <div className="px-0.5 pt-3">
                   <div className="min-w-0">
                     <h3 className="truncate text-[13px] font-semibold leading-5 sm:text-sm">{product.title}</h3>
+                    <p className="mt-1 h-8 overflow-hidden text-[11px] leading-4 text-muted-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                      {product.shortDescription}
+                    </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {product.price != null ? `₹${product.price.toLocaleString("en-IN")}` : "Price on request"}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    tabIndex={copy === 1 ? 0 : -1}
-                    aria-label={`Add ${product.title} to cart`}
-                    onClick={() => addToCart(product)}
-                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-border/80 bg-background text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  >
-                    <Plus className="size-4" aria-hidden="true" />
-                  </button>
                 </div>
               </article>
             )),
