@@ -22,6 +22,7 @@ const heroSlides = [
       "Discover unique products crafted by talented Indian artisans. Find your next bestseller and bring local craftsmanship to customers worldwide.",
     cta: "Explore Products",
     href: "/products",
+    color: "maroon",
   },
   {
     image: "/zJ1Pnw-removebg-preview.png",
@@ -32,6 +33,7 @@ const heroSlides = [
       "Browse thoughtful finds from independent makers and introduce your customers to the people and traditions behind every product.",
     cta: "Browse the Catalog",
     href: "/products",
+    color: "#36113E",
   },
   {
     image: "/fnNOue-removebg-preview.png",
@@ -42,6 +44,7 @@ const heroSlides = [
       "Build a business around products you believe in, with inspiration and practical resources to help you take the next step.",
     cta: "See How It Works",
     href: "/about",
+    color: "black",
   },
   {
     image: "/9wAwpK-removebg-preview.png",
@@ -52,6 +55,7 @@ const heroSlides = [
       "Get a clearer view of the numbers behind your business and make informed choices as you find products your customers will love.",
     cta: "Explore Margins",
     href: "/margins",
+    color: "#4E9A78",
   },
   {
     image: "/F7R7qZ-removebg-preview.png",
@@ -62,6 +66,7 @@ const heroSlides = [
       "Discover products, fresh ideas, and content inspiration to help your brand connect with customers in a way that feels like you.",
     cta: "Get Inspired",
     href: "/social-media-content",
+    color: "#4C4920",
   },
 ] as const;
 
@@ -154,6 +159,7 @@ export function HomeHero() {
               {Array.from({ length: 3 }, (_, copy) =>
                 heroSlides.map((slide, index) => {
                   const position = copy * heroSlides.length + index;
+                  const finalWordStart = slide.title.lastIndexOf(" ") + 1;
 
                   return (
                     <article
@@ -181,7 +187,13 @@ export function HomeHero() {
                           }
                           className="mt-5 max-w-[470px] text-balance font-heading text-[clamp(2rem,3.1vw,2.9rem)] font-semibold leading-[1.1] tracking-[-0.045em]"
                         >
-                          {slide.title}
+                          {slide.title.slice(0, finalWordStart)}
+                          <span
+                            className="inline-block rounded-lg px-2 pb-1 text-white shadow-[inset_0_2px_3px_rgba(255,255,255,0.35),inset_0_-3px_5px_rgba(0,0,0,0.12),0_3px_0_rgba(0,0,0,0.12)]"
+                            style={{ backgroundColor: slide.color }}
+                          >
+                            {slide.title.slice(finalWordStart)}
+                          </span>
                         </h1>
                         <p className="mt-5 max-w-[390px] text-sm leading-[1.75] text-muted-foreground">
                           {slide.description}
@@ -189,7 +201,8 @@ export function HomeHero() {
                         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                           <Link
                             href={slide.href}
-                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-[0_6px_18px_-6px_var(--primary)] transition-[background-color,box-shadow] hover:bg-primary/90 hover:shadow-[0_8px_22px_-6px_var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-xl px-4 text-sm font-semibold text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_6px_18px_-6px_var(--primary)] transition-[filter,box-shadow] hover:brightness-95 hover:shadow-[0_8px_22px_-6px_var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                            style={{ backgroundColor: slide.color }}
                           >
                             {slide.cta}
                             <ArrowUpRight
