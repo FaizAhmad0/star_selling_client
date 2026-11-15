@@ -189,10 +189,12 @@ export function HomeHero() {
                         >
                           {slide.title.slice(0, finalWordStart)}
                           <span
-                            className="inline-block rounded-lg px-2 pb-1 text-white shadow-[inset_0_2px_3px_rgba(255,255,255,0.35),inset_0_-3px_5px_rgba(0,0,0,0.12),0_3px_0_rgba(0,0,0,0.12)]"
+                            className="relative left-3 inline-block -skew-x-12 pb-1 pl-1.5 pr-3 text-white shadow-[inset_0_2px_3px_rgba(255,255,255,0.35),inset_0_-3px_5px_rgba(0,0,0,0.12),0_3px_0_rgba(0,0,0,0.12)]"
                             style={{ backgroundColor: slide.color }}
                           >
-                            {slide.title.slice(finalWordStart)}
+                            <span className="inline-block skew-x-12">
+                              {slide.title.slice(finalWordStart)}
+                            </span>
                           </span>
                         </h1>
                         <p className="mt-5 max-w-[390px] text-sm leading-[1.75] text-muted-foreground">
