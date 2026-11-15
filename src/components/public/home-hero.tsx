@@ -44,7 +44,7 @@ const heroSlides = [
     href: "/about",
   },
   {
-    image: "/blKdim-removebg-preview.png",
+    image: "/9wAwpK-removebg-preview.png",
     imageAlt: "Shopping bag illustration on a warm yellow background",
     eyebrow: "Make every sale count",
     title: "Know Your Margins. Grow with Confidence.",
