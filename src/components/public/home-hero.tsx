@@ -168,9 +168,9 @@ export function HomeHero() {
                       inert={slidePosition !== position}
                       aria-roledescription="slide"
                       aria-label={`${index + 1} of ${heroSlides.length}`}
-                      className="grid w-full flex-none items-center gap-8 overflow-hidden pt-8 lg:min-h-[min(520px,calc(100svh-180px))] lg:grid-cols-[0.82fr_1.18fr] lg:gap-8"
+                      className="grid w-full flex-none items-center gap-8 overflow-hidden pt-8 lg:min-h-[min(520px,calc(100svh-180px))] lg:grid-cols-[0.92fr_1.08fr] lg:gap-4"
                     >
-                      <div className="order-2 min-w-0 max-w-[430px] lg:order-1 lg:pr-2">
+                      <div className="order-2 min-w-0 max-w-[500px] lg:order-1 lg:pr-2">
                         <div className="inline-flex items-center gap-2.5 rounded-full border border-primary/10 bg-primary/[0.04] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.13em] text-primary sm:text-[10px]">
                           <Sparkles
                             className="size-3.5 shrink-0"
@@ -185,7 +185,7 @@ export function HomeHero() {
                               ? "hero-heading"
                               : undefined
                           }
-                          className="mt-5 max-w-[470px] text-balance font-heading text-[clamp(2rem,3.1vw,2.9rem)] font-semibold leading-[1.1] tracking-[-0.045em]"
+                          className="mt-5 max-w-[500px] text-balance font-heading text-[clamp(2rem,3.1vw,2.9rem)] font-semibold leading-[1.1] tracking-[-0.045em]"
                         >
                           {slide.title.slice(0, finalWordStart)}
                           <span
@@ -197,7 +197,7 @@ export function HomeHero() {
                             </span>
                           </span>
                         </h1>
-                        <p className="mt-5 max-w-[390px] text-sm leading-[1.75] text-muted-foreground">
+                        <p className="mt-5 max-w-[450px] text-sm leading-[1.75] text-muted-foreground">
                           {slide.description}
                         </p>
                         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -223,7 +223,7 @@ export function HomeHero() {
                             />
                           </Link>
                         </div>
-                        <div className="mt-6 flex max-w-[390px] items-center gap-3 border-t border-border/70 pt-4 text-[11px] leading-5 text-muted-foreground">
+                        <div className="mt-6 flex max-w-[450px] items-center gap-3 border-t border-border/70 pt-4 text-[11px] leading-5 text-muted-foreground">
                           <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/[0.05]">
                             <Globe2
                               className="size-4 text-primary"
@@ -235,7 +235,7 @@ export function HomeHero() {
                         </div>
                       </div>
 
-                      <div className="relative order-1 aspect-[4/3] min-w-0 lg:order-2 lg:scale-110">
+                      <div className="relative order-1 aspect-[4/3] min-w-0 lg:order-2 lg:-translate-x-4 lg:scale-110">
                         <Image
                           src={slide.image}
                           alt={slide.imageAlt}
