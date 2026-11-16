@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useCurrentUser } from "@/features/auth/hooks/use-auth";
 import { HomeHero } from "@/components/public/home-hero";
 import { HomeProducts } from "@/components/public/home-products";
+import { HomeDiscovery } from "@/components/public/home-discovery";
 import { PublicLayout } from "@/components/public/public-layout";
 import { ROLE_DASHBOARD } from "@/components/public/public-navigation";
 
@@ -27,6 +28,7 @@ export default function Home() {
     <PublicLayout>
       <HomeHero />
       <HomeProducts />
+      <HomeDiscovery />
     </PublicLayout>
   );
 }
