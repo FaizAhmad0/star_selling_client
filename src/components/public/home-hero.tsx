@@ -214,11 +214,18 @@ export function HomeHero() {
                           </Link>
                           <Link
                             href="/about"
-                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-border/80 bg-background px-4 text-sm font-medium text-foreground/80 transition-colors hover:border-primary/25 hover:bg-primary/[0.03] hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-border/80 bg-background px-4 text-sm font-medium text-foreground/80 transition-colors hover:border-[var(--hover-color)] hover:bg-[var(--hover-bg)] hover:text-[var(--hover-color)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                            style={
+                              {
+                                "--hover-color": slide.color,
+                                "--hover-bg": `${slide.color}0D`,
+                              } as React.CSSProperties
+                            }
                           >
                             Discover Our Story
                             <ArrowRight
-                              className="size-4 transition-transform motion-safe:group-hover:translate-x-0.5"
+                              className="size-4 transition-all motion-safe:group-hover:translate-x-0.5"
+                              style={{ color: slide.color }}
                               aria-hidden="true"
                             />
                           </Link>
