@@ -177,6 +177,7 @@ export function HomeHero() {
                             strokeWidth={1.5}
                             aria-hidden="true"
                           />
+                          {/* yet to fix */}
                           {slide.eyebrow}
                         </div>
                         <h1
