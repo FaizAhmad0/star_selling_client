@@ -204,7 +204,7 @@ export function HomeHero() {
                         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                           <Link
                             href={slide.href}
-                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-xl px-4 text-sm font-semibold text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_6px_18px_-6px_var(--primary)] transition-[filter,box-shadow] hover:brightness-95 hover:shadow-[0_8px_22px_-6px_var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-3 whitespace-nowrap rounded-xl px-4 text-sm font-semibold text-white transition-[filter,box-shadow] hover:brightness-95 hover:shadow-[0_5px_8px_-6px_var(--primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
                             style={{ backgroundColor: slide.color }}
                           >
                             {slide.cta}
@@ -215,18 +215,18 @@ export function HomeHero() {
                           </Link>
                           <Link
                             href="/about"
-                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-border/80 bg-background px-4 text-sm font-medium text-foreground/80 transition-colors hover:border-[var(--hover-color)] hover:bg-[var(--hover-bg)] hover:text-[var(--hover-color)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                            className="group inline-flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl border bg-background px-4 text-sm font-semibold transition-colors hover:bg-[var(--hover-bg)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
                             style={
                               {
-                                "--hover-color": slide.color,
+                                borderColor: `${slide.color}`,
+                                color: slide.color,
                                 "--hover-bg": `${slide.color}0D`,
                               } as React.CSSProperties
                             }
                           >
                             Discover Our Story
                             <ArrowRight
-                              className="size-4 transition-all motion-safe:group-hover:translate-x-0.5"
-                              style={{ color: slide.color }}
+                              className="size-4 transition-transform motion-safe:group-hover:translate-x-0.5"
                               aria-hidden="true"
                             />
                           </Link>
