@@ -73,7 +73,7 @@ export function HomeDiscovery() {
         aria-labelledby="shop-categories-heading"
         className="mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12 pb-14"
       >
-        <div className="mb-8 flex flex-col gap-4 border-b border-border/70 pb-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-8 flex flex-col gap-4 border-b border-border/70 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2
               id="shop-categories-heading"
@@ -81,7 +81,7 @@ export function HomeDiscovery() {
             >
               Shop by category
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+            <p className="max-w-xl text-sm leading-6 text-muted-foreground">
               Explore considered finds from independent makers and artisans.
             </p>
           </div>

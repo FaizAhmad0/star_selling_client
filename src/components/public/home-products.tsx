@@ -24,7 +24,13 @@ function setScrollPositionImmediately(element: HTMLElement, left: number) {
   element.style.scrollBehavior = "";
 }
 
-function HomeProductImage({ product, index }: { product: Product; index: number }) {
+function HomeProductImage({
+  product,
+  index,
+}: {
+  product: Product;
+  index: number;
+}) {
   const [broken, setBroken] = useState(false);
   const src = product.colors[0]?.images[0];
 
@@ -88,7 +94,8 @@ export function HomeProducts() {
       const step = firstCard.getBoundingClientRect().width + gap;
       index = (index + 1) % products.length;
       const wrapped = index === 0;
-      const physicalIndex = products.length + index + (wrapped ? products.length : 0);
+      const physicalIndex =
+        products.length + index + (wrapped ? products.length : 0);
       track.scrollTo({ left: physicalIndex * step, behavior: "smooth" });
 
       if (wrapped) {
@@ -106,21 +113,38 @@ export function HomeProducts() {
   }, [products.length]);
 
   return (
-    <section aria-labelledby="home-products-heading" className="mx-auto w-full max-w-[1280px] px-5 py-8 sm:px-8 lg:px-12">
-      <div className="mb-5 flex items-center justify-between border-b border-border/70 pb-4">
-        <h2 id="home-products-heading" className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-          Products
-        </h2>
+    <section
+      aria-labelledby="home-products-heading"
+      className="mx-auto w-full max-w-[1280px] px-5 py-8 sm:px-8 lg:px-12"
+    >
+      <div className="mb-8 flex flex-col gap-4 border-b border-border/70 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2
+            id="shop-categories-heading"
+            className="mt-2 font-heading text-2xl font-semibold tracking-tight sm:text-3xl"
+          >
+            Featured Products
+          </h2>
+          <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+            Discover our handpicked collection of standout products, crafted
+            with quality, creativity.
+          </p>
+        </div>
         <Link
           href="/products"
-          className="inline-flex min-h-10 items-center gap-2 text-xs font-medium text-foreground/75 transition-colors hover:text-primary sm:text-sm"
+          className="inline-flex min-h-10 items-center gap-2 self-start text-sm font-semibold text-primary transition-colors hover:text-primary/80 sm:self-auto"
         >
-          See all products <ArrowRight className="size-4" aria-hidden="true" />
+          Explore all products{" "}
+          <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
       </div>
 
       {isPending ? (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5" aria-label="Loading products" role="status">
+        <div
+          className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5"
+          aria-label="Loading products"
+          role="status"
+        >
           {Array.from({ length: 5 }, (_, index) => (
             <div key={index} className="animate-pulse">
               <div className="aspect-square rounded-xl bg-muted" />
@@ -130,8 +154,13 @@ export function HomeProducts() {
           ))}
         </div>
       ) : isError || products.length === 0 ? (
-        <p className="py-12 text-center text-sm text-muted-foreground" role="status">
-          {isError ? "Unable to load products right now." : "Products are coming soon."}
+        <p
+          className="py-12 text-center text-sm text-muted-foreground"
+          role="status"
+        >
+          {isError
+            ? "Unable to load products right now."
+            : "Products are coming soon."}
         </p>
       ) : (
         <div
@@ -150,7 +179,9 @@ export function HomeProducts() {
                   href={`/products?product=${encodeURIComponent(product._id)}`}
                   tabIndex={copy === 1 ? 0 : -1}
                   className="block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-                  style={{ backgroundColor: cardColors[index % cardColors.length] }}
+                  style={{
+                    backgroundColor: cardColors[index % cardColors.length],
+                  }}
                   aria-label={`View ${product.title}`}
                 >
                   <div className="aspect-square overflow-hidden">
@@ -159,12 +190,16 @@ export function HomeProducts() {
                 </Link>
                 <div className="px-0.5 pt-3">
                   <div className="min-w-0">
-                    <h3 className="truncate text-[13px] font-semibold leading-5 sm:text-sm">{product.title}</h3>
+                    <h3 className="truncate text-[13px] font-semibold leading-5 sm:text-sm">
+                      {product.title}
+                    </h3>
                     <p className="mt-1 h-8 overflow-hidden text-[11px] leading-4 text-muted-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
                       {product.shortDescription}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {product.price != null ? `₹${product.price.toLocaleString("en-IN")}` : "Price on request"}
+                      {product.price != null
+                        ? `₹${product.price.toLocaleString("en-IN")}`
+                        : "Price on request"}
                     </p>
                   </div>
                 </div>
